@@ -3736,4 +3736,10 @@
   'Denomination' => 'Denomination',
   'Cash Deposit Report' => 'Cash Deposit Report',
   'bank' => 'Bank',
+  'Expenses_form' => 'Expenses form',
+  'Deleted_Successfully.' => 'Deleted Successfully.',
+  'Customer Info' => 'Customer Info',
+  'Card Num' => 'Card Num',
+  'Card Code' => 'Card Code',
+  'Card Amt' => 'Card Amt',
 );

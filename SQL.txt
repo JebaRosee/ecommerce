@@ -1,0 +1,11 @@
+alter table expenses add acc_code text default null;
+alter table expenses add acc_name text default null;
+alter table expenses add remarks text default null;
+alter table expenses add amount text default null;
+alter table expenses add date date default null;
+
+
+alter table carddeposit add `bank_name` text COLLATE utf8mb4_unicode_ci DEFAULT NULL;
+alter table carddeposit add `totalAmount` text COLLATE utf8mb4_unicode_ci DEFAULT NULL;
+
+alter table orders add card_deposit text default null;

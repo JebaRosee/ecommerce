@@ -22,14 +22,14 @@ class ExpensesController extends Controller
         if($request->has('search'))
         {
             $key = explode(' ', $request['search']);
-            $categories = Category::where(function ($q) use ($key) {
+            $categories = Expenses::where(function ($q) use ($key) {
                 foreach ($key as $value) {
-                    $q->orWhere('name', 'like', "%{$value}%");
+                    $q->orWhere('acc_name', 'like', "%{$value}%");
                 }
             });
             $query_param = ['search' => $request['search']];
         }else{
-            $categories = Category::where(['position' => 0]);
+            $categories = Expenses::orderBy('created_at', 'desc');
         }
 
         $categories = $categories->latest()->paginate(Helpers::pagination_limit())->appends($query_param);
@@ -39,103 +39,115 @@ class ExpensesController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'image' => 'required',
-            'priority'=>'required'
+            'acc_code' => 'required',
+            'acc_name' => 'required',
+            'amount'=>'required'
         ], [
-            'name.required' => 'Category name is required!',
-            'image.required' => 'Category image is required!',
-            'priority.required' => 'Category priority is required!',
+            'acc_code.required' => 'Code is required!',
+            'acc_name.required' => 'Name is required!',
+            'amount.required' => 'Amount is required!',
         ]);
 
-        $category = new Category;
-        $category->name = $request->name[array_search('en', $request->lang)];
-        $category->slug = Str::slug($request->name[array_search('en', $request->lang)]);
-        $category->icon = ImageManager::upload('category/', 'png', $request->file('image'));
-        $category->parent_id = 0;
-        $category->position = 0;
-        $category->priority = $request->priority;
-        $category->save();
+        // $category = new Category;
+        // $category->name = $request->name[array_search('en', $request->lang)];
+        // $category->slug = Str::slug($request->name[array_search('en', $request->lang)]);
+        // $category->icon = ImageManager::upload('category/', 'png', $request->file('image'));
+        // $category->parent_id = 0;
+        // $category->position = 0;
+        // $category->priority = $request->priority;
+        // $category->save();
 
-        $data = [];
-        foreach ($request->lang as $index => $key) {
-            if ($request->name[$index] && $key != 'en') {
-                array_push($data, array(
-                    'translationable_type' => 'App\Model\Category',
-                    'translationable_id' => $category->id,
-                    'locale' => $key,
-                    'key' => 'name',
-                    'value' => $request->name[$index],
-                ));
-            }
-        }
-        if (count($data)) {
-            Translation::insert($data);
-        }
-
-        Toastr::success('Category added successfully!');
+        // $data = [];
+        // foreach ($request->lang as $index => $key) {
+        //     if ($request->name[$index] && $key != 'en') {
+        //         array_push($data, array(
+        //             'translationable_type' => 'App\Model\Category',
+        //             'translationable_id' => $category->id,
+        //             'locale' => $key,
+        //             'key' => 'name',
+        //             'value' => $request->name[$index],
+        //         ));
+        //     }
+        // }
+        // if (count($data)) {
+        //     Translation::insert($data);
+        // }
+        $expenses = new Expenses;
+        // @dd($cashdeposit);
+        $expenses->acc_code = $request->acc_code;
+        $expenses->acc_name = $request->acc_name;
+        $expenses->remarks = $request->remarks;
+        $expenses->amount = $request->amount;
+        // $expenses->result2 = $request->result2;
+        $expenses->save();
+        // Expenses::create($request->all());
+        Toastr::success('Added successfully!');
         return back();
     }
 
     public function edit(Request $request, $id)
     {
-        $category = Category::with('translations')->withoutGlobalScopes()->find($id);
-        return view('admin-views.category.category-edit', compact('category'));
+        $category = Expenses::find($id);
+        return view('admin-views.expenses.expenses-edit', compact('category'));
     }
 
     public function update(Request $request)
     {
-        $category = Category::find($request->id);
-        $category->name = $request->name[array_search('en', $request->lang)];
-        $category->slug = Str::slug($request->name[array_search('en', $request->lang)]);
-        if ($request->image) {
-            $category->icon = ImageManager::update('category/', $category->icon, 'png', $request->file('image'));
-        }
-        $category->priority = $request->priority;
-        $category->save();
+        $expenses = Expenses::find($request->id);
+        // $category->name = $request->name[array_search('en', $request->lang)];
+        // $category->slug = Str::slug($request->name[array_search('en', $request->lang)]);
+        // if ($request->image) {
+        //     $category->icon = ImageManager::update('category/', $category->icon, 'png', $request->file('image'));
+        // }
+        $expenses->acc_code = $request->acc_code;
+        $expenses->acc_name = $request->acc_name;
+        $expenses->remarks = $request->remarks;
+        $expenses->amount = $request->amount;
+        // $expenses->result2 = $request->result2;
+        $expenses->save();
 
-        foreach ($request->lang as $index => $key) {
-            if ($request->name[$index] && $key != 'en') {
-                Translation::updateOrInsert(
-                    ['translationable_type' => 'App\Model\Category',
-                        'translationable_id' => $category->id,
-                        'locale' => $key,
-                        'key' => 'name'],
-                    ['value' => $request->name[$index]]
-                );
-            }
-        }
+        // foreach ($request->lang as $index => $key) {
+        //     if ($request->name[$index] && $key != 'en') {
+        //         Translation::updateOrInsert(
+        //             ['translationable_type' => 'App\Model\Category',
+        //                 'translationable_id' => $category->id,
+        //                 'locale' => $key,
+        //                 'key' => 'name'],
+        //             ['value' => $request->name[$index]]
+        //         );
+        //     }
+        // }
 
-        Toastr::success('Category updated successfully!');
+        Toastr::success('Updated successfully!');
         return back();
     }
 
     public function delete(Request $request)
     {
-        $categories = Category::where('parent_id', $request->id)->get();
-        if (!empty($categories)) {
-            foreach ($categories as $category) {
-                $categories1 = Category::where('parent_id', $category->id)->get();
-                if (!empty($categories1)) {
-                    foreach ($categories1 as $category1) {
-                        $translation = Translation::where('translationable_type','App\Model\Category')
-                                    ->where('translationable_id',$category1->id);
-                        $translation->delete();
-                        Category::destroy($category1->id);
+        // $categories = Category::where('parent_id', $request->id)->get();
+        // if (!empty($categories)) {
+        //     foreach ($categories as $category) {
+        //         $categories1 = Category::where('parent_id', $category->id)->get();
+        //         if (!empty($categories1)) {
+        //             foreach ($categories1 as $category1) {
+        //                 $translation = Translation::where('translationable_type','App\Model\Category')
+        //                             ->where('translationable_id',$category1->id);
+        //                 $translation->delete();
+        //                 Category::destroy($category1->id);
 
-                    }
-                }
-                $translation = Translation::where('translationable_type','App\Model\Category')
-                                    ->where('translationable_id',$category->id);
-                $translation->delete();
-                Category::destroy($category->id);
+        //             }
+        //         }
+        //         $translation = Translation::where('translationable_type','App\Model\Category')
+        //                             ->where('translationable_id',$category->id);
+        //         $translation->delete();
+        //         Category::destroy($category->id);
 
-            }
-        }
-        $translation = Translation::where('translationable_type','App\Model\Category')
-                                    ->where('translationable_id',$request->id);
-        $translation->delete();
-        Category::destroy($request->id);
+        //     }
+        // }
+        // $translation = Translation::where('translationable_type','App\Model\Category')
+        //                             ->where('translationable_id',$request->id);
+        // $translation->delete();
+        Expenses::destroy($request->id);
 
         return response()->json();
     }

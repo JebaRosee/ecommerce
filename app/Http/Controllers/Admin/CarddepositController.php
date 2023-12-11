@@ -9,6 +9,11 @@ use App\Model\Translation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Brian2694\Toastr\Facades\Toastr;
+use App\Model\Carddeposit;
+use App\CPU\OrderManager;
+use App\Model\Order;
+use App\Model\OrderDetail;
+use App\Model\OrderTransaction;
 
 class CarddepositController extends Controller
 {
@@ -26,7 +31,12 @@ class CarddepositController extends Controller
             });
             $query_param = ['search' => $request['search']];
         }else{
-            $categories = Category::where(['position' => 0]);
+            $categories = Order::where('card_amt', '>', 0)
+            ->whereNotNull('card_amt')
+            ->where(function ($query) {
+                $query->where('card_deposit', 0)
+                      ->orWhereNull('card_deposit');
+            });
         }
 
         $categories = $categories->latest()->paginate(Helpers::pagination_limit())->appends($query_param);
@@ -35,43 +45,61 @@ class CarddepositController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'image' => 'required',
-            'priority'=>'required'
-        ], [
-            'name.required' => 'Category name is required!',
-            'image.required' => 'Category image is required!',
-            'priority.required' => 'Category priority is required!',
-        ]);
+        // $request->validate([
+        //     'name' => 'required',
+        //     'image' => 'required',
+        //     'priority'=>'required'
+        // ], [
+        //     'name.required' => 'Category name is required!',
+        //     'image.required' => 'Category image is required!',
+        //     'priority.required' => 'Category priority is required!',
+        // ]);
 
-        $category = new Category;
-        $category->name = $request->name[array_search('en', $request->lang)];
-        $category->slug = Str::slug($request->name[array_search('en', $request->lang)]);
-        $category->icon = ImageManager::upload('category/', 'png', $request->file('image'));
-        $category->parent_id = 0;
-        $category->position = 0;
-        $category->priority = $request->priority;
+        // $category = new Category;
+        // $category->name = $request->name[array_search('en', $request->lang)];
+        // $category->slug = Str::slug($request->name[array_search('en', $request->lang)]);
+        // $category->icon = ImageManager::upload('category/', 'png', $request->file('image'));
+        // $category->parent_id = 0;
+        // $category->position = 0;
+        // $category->priority = $request->priority;
+        // $category->save();
+
+        // $data = [];
+        // foreach ($request->lang as $index => $key) {
+        //     if ($request->name[$index] && $key != 'en') {
+        //         array_push($data, array(
+        //             'translationable_type' => 'App\Model\Category',
+        //             'translationable_id' => $category->id,
+        //             'locale' => $key,
+        //             'key' => 'name',
+        //             'value' => $request->name[$index],
+        //         ));
+        //     }
+        // }
+        // if (count($data)) {
+        //     Translation::insert($data);
+        // }
+
+        $orderIds = $request->input('order_ids');
+        $bankId = $request->input('bank_name');
+        $totalAmount = $request->input('totalAmount');
+            //  @dd($request);
+        Order::whereIn('id', $orderIds)->update(['card_deposit' => 1]);
+
+        // Save card deposit information
+        $category = new Carddeposit;
+        $category->bank_name = $request->bank_name;
+        $category->totalAmount = $request->totalAmount;
         $category->save();
+        // Carddeposit::create([
+        //     'bank_name' => $bankId,
+        //     'totalAmount' => $totalAmount,
+        // ]);
 
-        $data = [];
-        foreach ($request->lang as $index => $key) {
-            if ($request->name[$index] && $key != 'en') {
-                array_push($data, array(
-                    'translationable_type' => 'App\Model\Category',
-                    'translationable_id' => $category->id,
-                    'locale' => $key,
-                    'key' => 'name',
-                    'value' => $request->name[$index],
-                ));
-            }
-        }
-        if (count($data)) {
-            Translation::insert($data);
-        }
-
-        Toastr::success('Category added successfully!');
-        return back();
+        Toastr::success('Card deposit updated successfully!');
+        // return redirect()->back()->with('success', 'Orders and card deposit updated successfully');
+        // return response()->json(['message' => 'Orders and card deposit updated successfully'], 200);
+         return back();
     }
 
     public function edit(Request $request, $id)

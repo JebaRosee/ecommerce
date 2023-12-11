@@ -25,7 +25,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body" style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
-                        <form action="{{route('admin.category.store')}}" method="POST" enctype="multipart/form-data">
+                        <form action="{{route('admin.expenses.store')}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @php($language=\App\Model\BusinessSetting::where('type','pnc_language')->first())
                             @php($language = $language->value ?? null)
@@ -45,22 +45,23 @@
                                 <div class="col-lg-3">
                                     <div class="form-group">
                                     <label class="title-color">{{\App\CPU\translate('account_code')}}<span class="text-danger">*</span></label>
-                                    <select onchange="customer_change(this.value);" id='customer' name="customer_id" data-placeholder="Walk In Customer" class="js-data-example-ajax form-control form-ellipsis">
+                                    {{-- <select onchange="customer_change(this.value);" id='customer' name="customer_id" data-placeholder="Walk In Customer" class="js-data-example-ajax form-control form-ellipsis">
                                             <option value="0">{{\App\CPU\translate('walking_customer')}}</option>
-                                    </select>
+                                    </select> --}}
+                                    <input type="text" name="acc_code" class="form-control" placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('Code')}}" {{$lang == $default_lang? 'required':''}} required>
                                     </div>
                                 </div>
                                 <div class="col-md-3 col-lg-3 form-group">
                                     <label class="title-color">{{\App\CPU\translate('account_name')}}<span class="text-danger">*</span></label>
-                                    <input type="text" name="name[]" class="form-control"placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('Meals Expenses')}}" {{$lang == $default_lang? 'required':''}}>
+                                    <input type="text" name="acc_name" class="form-control"placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('Meals Expenses')}}" {{$lang == $default_lang? 'required':''}} required>
                                 </div>
                                 <div class="col-md-1 col-lg-4 form-group">
                                     <label class="title-color">{{\App\CPU\translate('Remarks')}}<span class="text-danger">*</span></label>
-                                    <input type="text" name="name[]" class="form-control"placeholder="{{\App\CPU\translate('Type')}} {{\App\CPU\translate('here')}}" {{$lang == $default_lang? 'required':''}}>
+                                    <input type="text" name="remarks" class="form-control"placeholder="{{\App\CPU\translate('Type')}} {{\App\CPU\translate('here')}}" {{$lang == $default_lang? 'required':''}} required>
                                 </div>
                                 <div class="col-md-1 col-lg-2 form-group">
                                     <label class="title-color">{{\App\CPU\translate('amount')}}<span class="text-danger">*</span></label>
-                                    <input type="text" name="name[]" class="form-control"placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('1000')}}" {{$lang == $default_lang? 'required':''}}>
+                                    <input type="text" name="amount" class="form-control"placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('1000')}}" {{$lang == $default_lang? 'required':''}} required>
                                 </div>
                             </div>
 
@@ -83,8 +84,8 @@
                             class="table table-hover table-borderless table-thead-bordered table-nowrap table-align-middle card-table w-100">
                             <thead class="thead-light thead-50 text-capitalize">
                                 <tr>
-                                    <th>{{ \App\CPU\translate('SI')}}</th>
-                                    <th class="text-center">{{ \App\CPU\translate('Account')}} {{ \App\CPU\translate('Name')}}</th>
+                                    <th>{{ \App\CPU\translate('ID')}}</th>
+                                    <th >{{ \App\CPU\translate('Account')}} {{ \App\CPU\translate('Name')}}</th>
                                     <th>{{ \App\CPU\translate('Remarks')}}</th>
                                     <th>{{\App\CPU\translate('Amount')}}</th>
                                     <th class="text-center">{{ \App\CPU\translate('action')}}</th>
@@ -94,15 +95,17 @@
                             @foreach($categories as $key=>$category)
                                 <tr>
                                     <td >{{$category['id']}}</td>
-                                    <td class="text-center">
+                                    {{-- <td class="text-center">
                                         <img class="rounded" width="64"
                                                 onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'"
                                                 src="{{asset('storage/app/public/category')}}/{{$category['icon']}}">
-                                    </td>
-                                    <td>{{$category['defaultname']}}</td>
+                                    </td> --}}
+                                    <td>{{$category['acc_name']}}</td>
                                     <td>
-                                        {{$category['priority']}}
+                                        {{$category['remarks']}}
                                     </td>
+                                    <td >
+                                        {{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($category['amount']))}}</td>
                                     <!-- <td class="text-center">
                                         <label class="switcher mx-auto">
                                             <input type="checkbox" class="switcher_input category-status"
@@ -114,7 +117,7 @@
                                         <div class="d-flex justify-content-center gap-10">
                                             <a class="btn btn-outline-info btn-sm square-btn"
                                                 title="{{ \App\CPU\translate('Edit')}}"
-                                                href="{{route('admin.category.edit',[$category['id']])}}">
+                                                href="{{route('admin.expenses.edit',[$category['id']])}}">
                                                 <i class="tio-edit"></i>
                                             </a>
                                             <a class="btn btn-outline-danger btn-sm delete square-btn"
@@ -278,11 +281,11 @@ $(document).on('ready', function () {
                         }
                     });
                     $.ajax({
-                        url: "{{route('admin.category.delete')}}",
+                        url: "{{route('admin.expenses.delete')}}",
                         method: 'POST',
                         data: {id: id},
                         success: function () {
-                            toastr.success('{{\App\CPU\translate('Category_deleted_Successfully.')}}');
+                            toastr.success('{{\App\CPU\translate('Deleted_Successfully.')}}');
                             location.reload();
                         }
                     });

@@ -126,6 +126,10 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('update/{id}', 'ExpensesController@edit')->name('update');
             Route::post('update/{id}', 'ExpensesController@update');
             Route::post('status', 'ExpensesController@status')->name('status');
+            Route::get('fetch', 'ExpensesController@fetch')->name('fetch');
+            Route::post('store', 'ExpensesController@store')->name('store');
+            Route::get('edit/{id}', 'ExpensesController@edit')->name('edit');
+            Route::post('delete', 'ExpensesController@delete')->name('delete');
         });
 
 

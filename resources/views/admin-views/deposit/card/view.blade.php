@@ -24,7 +24,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body" style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
-                        <form action="{{route('admin.category.store')}}" method="POST" enctype="multipart/form-data">
+                        <form action="{{route('admin.card_deposit.store')}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @php($language=\App\Model\BusinessSetting::where('type','pnc_language')->first())
                             @php($language = $language->value ?? null)
@@ -45,7 +45,7 @@
                                     
                                 <div class="form-group">
                                     <label class="title-color">{{\App\CPU\translate('Account_type')}}<span class="text-danger">*</span></label>
-                                    <select id='bank' name="bank_id" class=" form-control form-ellipsis">
+                                    <select id='bank' name="bank_name" class=" form-control form-ellipsis">
                                             <option value="0">{{\App\CPU\translate('Select')}}</option>
                                             <option value="Owner">{{\App\CPU\translate('Owner')}}</option>
                                             <option value="City Union Bank">{{\App\CPU\translate('City Union Bank')}}</option>
@@ -57,7 +57,7 @@
 
                                 <div class="col-md-3 col-lg-2 form-group">
                                     <label class="title-color">{{\App\CPU\translate('Total_amount')}}<span class="text-danger">*</span></label>
-                                    <input type="text" name="name[]" class="form-control"placeholder="{{\App\CPU\translate('')}} {{\App\CPU\translate('')}}" {{$lang == $default_lang? 'required':''}} readonly>
+                                    <input type="text" name="totalAmount"  id="totalAmount" class="form-control"placeholder="{{\App\CPU\translate('')}} {{\App\CPU\translate('')}}" {{$lang == $default_lang? 'required':''}} readonly required>
 
                                 </div>
                                 
@@ -122,7 +122,7 @@
                                 <button type="reset" id="reset" class="btn btn-secondary">{{\App\CPU\translate('reset')}}</button>
                                 <button type="submit" class="btn btn--primary">{{\App\CPU\translate('submit')}}</button>
                             </div>
-                        </form>
+                        {{-- </form> --}}
                     </div>
                 </div>
             </div>
@@ -138,33 +138,49 @@
                             <thead class="thead-light thead-50 text-capitalize">
                                 <tr>
                                     <th>{{ \App\CPU\translate('Select')}}</th>
-                                    <th class="text-center">{{ \App\CPU\translate('Date')}} {{ \App\CPU\translate('')}}</th>
-                                    <th>{{ \App\CPU\translate('Code')}}</th>
-                                    <th>{{\App\CPU\translate('APR Code')}}</th>
-                                    <th class="text-center">{{ \App\CPU\translate('Amount')}}</th>
+                                    <th >{{ \App\CPU\translate('Date')}} {{ \App\CPU\translate('')}}</th>
+                                    <th>{{ \App\CPU\translate('Customer Info')}}</th>
+                                    <th>{{\App\CPU\translate('Card Num')}}</th>
+                                    <th>{{\App\CPU\translate('Card Code')}}</th>
+                                    <th>{{\App\CPU\translate('Card Amt')}}</th>
+                                    {{-- <th class="text-center">{{ \App\CPU\translate('Amount')}}</th> --}}
                                 </tr>
                             </thead>
                             <tbody>
                             @foreach($categories as $key=>$category)
                                 <tr>
                                     <!-- <td >{{$category['id']}}</td> -->
-                                    <td><input type="radio" id="cash" value="cash" name="type"  checked></td>
-                                    <td class="text-center">
-                                        <img class="rounded" width="64"
-                                                onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'"
-                                                src="{{asset('storage/app/public/category')}}/{{$category['icon']}}">
-                                    </td>
-                                    <td>{{$category['defaultname']}}</td>
+                                    
+                                    <td><input type="checkbox" name="order_ids[]" value="{{ $category['id'] }}" class="card-select" data-amount="{{ $category['card_amt'] }}"></td>
+                                    <td>{{ $category['created_at']->format('d-m-Y') }}</td>
                                     <td>
-                                        {{$category['priority']}}
+                                        @if($category->customer_id == 0)
+                                            <strong class="title-name">{{\App\CPU\translate('walking_customer')}}</strong>
+                                        @else
+                                            @if($category->customer)
+                                                <a class="text-body text-capitalize" href="{{route('admin.orders.details',['id'=>$category['id']])}}">
+                                                    <strong class="title-name">{{$category->customer['f_name'].' '.$category->customer['l_name']}}</strong>
+                                                </a>
+                                                <a class="d-block title-color" href="tel:{{ $category->customer['phone'] }}">{{ $category->customer['phone'] }}</a>
+                                            @else
+                                                <label class="badge badge-danger fz-12">{{\App\CPU\translate('invalid_customer_data')}}</label>
+                                            @endif
+                                        @endif
                                     </td>
-                                    <td class="text-center">
+                                    <td>{{$category['card_num']}}</td>
+                                    <td>
+                                        {{$category['card_code']}}
+                                    </td>
+                                    
+                                    <td >
+                                        {{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($category['card_amt']))}}</td>
+                                    {{-- <td class="text-center">
                                         <label class="switcher mx-auto">
                                             <input type="checkbox" class="switcher_input category-status"
                                                     id="{{$category['id']}}" {{$category->home_status == 1?'checked':''}}>
                                             <span class="switcher_control"></span>
                                         </label>
-                                    </td>
+                                    </td> --}}
                                     <!-- <td>
                                         <div class="d-flex justify-content-center gap-10">
                                             <a class="btn btn-outline-info btn-sm square-btn"
@@ -201,6 +217,7 @@
                 </div>
             </div>
         </div>
+    </form>
     </div>
 @endsection
 
@@ -433,5 +450,29 @@ $(document).on('ready', function () {
 });
 // ---------------paid by----------------
 
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var checkboxes = document.querySelectorAll('.card-select');
+            var totalAmountInput = document.getElementById('totalAmount');
+    
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', function () {
+                    calculateTotalAmount();
+                });
+            });
+    
+            function calculateTotalAmount() {
+                var totalAmount = 0;
+    
+                checkboxes.forEach(function (checkbox) {
+                    if (checkbox.checked) {
+                        totalAmount += parseFloat(checkbox.getAttribute('data-amount')) || 0;
+                    }
+                });
+    
+                totalAmountInput.value = totalAmount.toFixed(2);
+            }
+        });
     </script>
 @endpush

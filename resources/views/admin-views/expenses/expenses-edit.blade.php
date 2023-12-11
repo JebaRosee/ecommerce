@@ -1,6 +1,6 @@
 @extends('layouts.back-end.app')
 
-@section('title', \App\CPU\translate('Category'))
+@section('title', \App\CPU\translate('Expenses'))
 
 @section('content')
     <div class="content container-fluid">
@@ -13,7 +13,7 @@
                 @elseif($category['position'] == 2)
                     {{\App\CPU\translate('Sub Sub')}}
                 @endif
-                {{\App\CPU\translate('Category')}}
+                {{\App\CPU\translate('Expenses')}}
                 {{\App\CPU\translate('Update')}}
             </h2>
         </div>
@@ -24,10 +24,10 @@
             <div class="col-md-12">
                 <div class="card">
                     <!-- <div class="card-header">
-                        {{ \App\CPU\translate('category_form')}}
+                        {{ \App\CPU\translate('Expenses_form')}}
                     </div> -->
                     <div class="card-body" style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
-                        <form action="{{route('admin.category.update',[$category['id']])}}" method="POST" enctype="multipart/form-data">
+                        <form action="{{route('admin.expenses.update',[$category['id']])}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @php($language=\App\Model\BusinessSetting::where('type','pnc_language')->first())
                             @php($language = $language->value ?? null)
@@ -44,18 +44,18 @@
                                 @endforeach
                             </ul>
                             <div class="row">
-                                <div class="{{ $category['parent_id']==0 || $category['position'] == 1 ? 'col-lg-6':'col-12' }}">
+                                {{-- <div class="{{ $category['parent_id']==0 || $category['position'] == 1 ? 'col-lg-6':'col-12' }}">
                                     @foreach(json_decode($language) as $lang)
                                     <div>
                                         <?php
-                                        if (count($category['translations'])) {
-                                            $translate = [];
-                                            foreach ($category['translations'] as $t) {
-                                                if ($t->locale == $lang && $t->key == "name") {
-                                                    $translate[$lang]['name'] = $t->value;
-                                                }
-                                            }
-                                        }
+                                        // if (count($category['translations'])) {
+                                        //     $translate = [];
+                                        //     foreach ($category['translations'] as $t) {
+                                        //         if ($t->locale == $lang && $t->key == "name") {
+                                        //             $translate[$lang]['name'] = $t->value;
+                                        //         }
+                                        //     }
+                                        // }
                                         ?>
                                         <div class="form-group {{$lang != $default_lang ? 'd-none':''}} lang_form"
                                             id="{{$lang}}-form">
@@ -92,8 +92,8 @@
                                                    for="customFileEg1">{{\App\CPU\translate('choose')}} {{\App\CPU\translate('file')}}</label>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-lg-6 mt-5 mt-lg-0 from_part_2">
+                                </div> --}}
+                                {{-- <div class="col-lg-6 mt-5 mt-lg-0 from_part_2">
                                     <div class="form-group">
                                         <center>
                                             <img class="upload-img-view"
@@ -103,23 +103,59 @@
                                                     alt=""/>
                                         </center>
                                     </div>
-                                </div>
-                                @endif
-                                @if($category['position'] == 2)
-                                        <div class="d-flex justify-content-end gap-3">
+                                </div> 
+                                @endif --}}
+                                {{-- @if($category['position'] == 2) --}}
+                                        {{-- <div class="d-flex justify-content-end gap-3">
                                             <button type="reset" id="reset" class="btn btn-secondary px-4">{{ \App\CPU\translate('reset')}}</button>
                                             <button type="submit" class="btn btn--primary px-4">{{ \App\CPU\translate('update')}}</button>
+                                        </div> --}}
+                                        {{-- <div class="row form-group">
+                                            <label class="title-color">{{\App\CPU\translate('account_code')}}<span class="text-danger">*</span></label>
+            
+                                            <div class="col-sm-9">
+                                                <div class="input-group input-group-sm-down-break">
+                                                    <input type="text" class="form-control" name="acc_code" id="acc_code"
+                                                    placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('Code')}}" {{$lang == $default_lang? 'required':''}} required value="{{$category->acc_code}}">
+            
+                                                </div>
+                                            </div>
+                                        </div> --}}
+
+
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                            <label class="title-color">{{\App\CPU\translate('account_code')}}<span class="text-danger">*</span></label>
+                                            {{-- <select onchange="customer_change(this.value);" id='customer' name="customer_id" data-placeholder="Walk In Customer" class="js-data-example-ajax form-control form-ellipsis">
+                                                    <option value="0">{{\App\CPU\translate('walking_customer')}}</option>
+                                            </select> --}}
+                                            <input type="text" name="acc_code" class="form-control" placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('Code')}}" {{$lang == $default_lang? 'required':''}} required value="{{$category->acc_code}}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-lg-3 form-group">
+                                            <label class="title-color">{{\App\CPU\translate('account_name')}}<span class="text-danger">*</span></label>
+                                            <input type="text" name="acc_name" class="form-control"placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('Meals Expenses')}}" {{$lang == $default_lang? 'required':''}} required value="{{$category->acc_name}}">
+                                        </div>
+                                        <div class="col-md-1 col-lg-4 form-group">
+                                            <label class="title-color">{{\App\CPU\translate('Remarks')}}<span class="text-danger">*</span></label>
+                                            <input type="text" name="remarks" class="form-control"placeholder="{{\App\CPU\translate('Type')}} {{\App\CPU\translate('here')}}" {{$lang == $default_lang? 'required':''}} required value="{{$category->remarks}}">
+                                        </div>
+                                        <div class="col-md-1 col-lg-2 form-group">
+                                            <label class="title-color">{{\App\CPU\translate('amount')}}<span class="text-danger">*</span></label>
+                                            <input type="text" name="amount" class="form-control"placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('1000')}}" {{$lang == $default_lang? 'required':''}} required value="{{$category->amount}}">
                                         </div>
                                     </div>
-                                @endif
+
+                                    
+                                {{-- @endif --}}
                             </div>
 
-                            @if($category['parent_id']==0 || $category['position'] == 1)
+                            {{-- @if($category['parent_id']==0 || $category['position'] == 1) --}}
                                 <div class="d-flex justify-content-end gap-3">
                                     <button type="reset" id="reset" class="btn btn-secondary px-4">{{ \App\CPU\translate('reset')}}</button>
                                     <button type="submit" class="btn btn--primary px-4">{{ \App\CPU\translate('update')}}</button>
                                 </div>
-                            @endif
+                            {{-- @endif --}}
                         </form>
                     </div>
                 </div>
