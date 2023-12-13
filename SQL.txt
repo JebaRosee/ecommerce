@@ -9,3 +9,16 @@ alter table carddeposit add `bank_name` text COLLATE utf8mb4_unicode_ci DEFAULT 
 alter table carddeposit add `totalAmount` text COLLATE utf8mb4_unicode_ci DEFAULT NULL;
 
 alter table orders add card_deposit text default null;
+---------------------------------Finish--------------------------
+
+alter table receipts add `customer_id` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL;
+alter table receipts add `cash_amt` decimal(10,0) DEFAULT NULL;
+alter table receipts add  `card_num` int(4) DEFAULT NULL;
+ alter table receipts add `card_code` int(6) DEFAULT NULL;
+ alter table receipts add `card_amt` decimal(10,0) DEFAULT NULL;
+ alter table receipts add `upi_amt` decimal(10,0) DEFAULT NULL;
+ alter table receipts add `upi_id` varchar(60) COLLATE utf8mb4_unicode_ci DEFAULT NULL;
+ alter table receipts add `credit_amt` decimal(10,0) DEFAULT NULL;
+ alter table receipts add `credit_remark` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL;
+ alter table receipts add `card_deposit` text COLLATE utf8mb4_unicode_ci DEFAULT NULL;
+  alter table receipts add `receipt_amount` decimal(10,0) DEFAULT NULL;

@@ -11,6 +11,7 @@ use App\Model\Translation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Brian2694\Toastr\Facades\Toastr;
+use App\Model\Order;
 
 class ReceiptController extends Controller
 {
@@ -21,14 +22,14 @@ class ReceiptController extends Controller
         if($request->has('search'))
         {
             $key = explode(' ', $request['search']);
-            $categories = Category::where(function ($q) use ($key) {
+            $categories = Receipt::where(function ($q) use ($key) {
                 foreach ($key as $value) {
-                    $q->orWhere('name', 'like', "%{$value}%");
+                    $q->orWhere('created_at', 'like', "%{$value}%");
                 }
             });
             $query_param = ['search' => $request['search']];
         }else{
-            $categories = Category::where(['position' => 0]);
+            $categories = Receipt::orderBy('created_at', 'desc');
         }
 
         $categories = $categories->latest()->paginate(Helpers::pagination_limit())->appends($query_param);
@@ -37,42 +38,32 @@ class ReceiptController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'image' => 'required',
-            'priority'=>'required'
-        ], [
-            'name.required' => 'Category name is required!',
-            'image.required' => 'Category image is required!',
-            'priority.required' => 'Category priority is required!',
-        ]);
+        // $request->validate([
+        //     'name' => 'required',
+        //     'image' => 'required',
+        //     'priority'=>'required'
+        // ], [
+        //     'name.required' => 'Category name is required!',
+        //     'image.required' => 'Category image is required!',
+        //     'priority.required' => 'Category priority is required!',
+        // ]);
 
-        $category = new Category;
-        $category->name = $request->name[array_search('en', $request->lang)];
-        $category->slug = Str::slug($request->name[array_search('en', $request->lang)]);
-        $category->icon = ImageManager::upload('category/', 'png', $request->file('image'));
-        $category->parent_id = 0;
-        $category->position = 0;
-        $category->priority = $request->priority;
-        $category->save();
-
-        $data = [];
-        foreach ($request->lang as $index => $key) {
-            if ($request->name[$index] && $key != 'en') {
-                array_push($data, array(
-                    'translationable_type' => 'App\Model\Category',
-                    'translationable_id' => $category->id,
-                    'locale' => $key,
-                    'key' => 'name',
-                    'value' => $request->name[$index],
-                ));
-            }
-        }
-        if (count($data)) {
-            Translation::insert($data);
-        }
-
-        Toastr::success('Category added successfully!');
+        $receipt = new Receipt;
+        $receipt->customer_id = $request->customer_id;
+        $receipt->receipt_amount = $request->receipt_amount;
+        $receipt->cash_amt = $request->cash_amt;
+        $receipt->card_num = $request->card_num;
+        $receipt->card_code = $request->card_code;
+        $receipt->card_amt = $request->card_amt;
+        $receipt->upi_amt = $request->upi_amt;
+        $receipt->upi_id = $request->upi_id;
+        $receipt->credit_amt = $request->credit_amt;
+        $receipt->credit_remark = $request->credit_remark;
+        $receipt->save();
+        
+        // @dd($receipt->id);
+        session(['last_receipt' => $receipt->id]);
+        Toastr::success('Payment added successfully!');
         return back();
     }
 

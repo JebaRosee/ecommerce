@@ -112,6 +112,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('view', 'ReceiptController@index')->name('view');
             Route::get('add-new', 'ReceiptController@add_new')->name('add-new');
             Route::post('add-new', 'ReceiptController@store');
+            Route::post('store', 'ReceiptController@store')->name('store');
             Route::get('list', 'ReceiptController@list')->name('list');
             Route::get('update/{id}', 'ReceiptController@edit')->name('update');
             Route::post('update/{id}', 'ReceiptController@update');
@@ -631,6 +632,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::post('tax', 'POSController@update_tax')->name('tax');
             Route::post('discount', 'POSController@update_discount')->name('discount');
             Route::get('customers', 'POSController@get_customers')->name('customers');
+            Route::get('customers-withoutwalkin', 'POSController@get_customers_without_walkin')->name('customers-withoutwalkin');
             Route::post('order', 'POSController@place_order')->name('order');
             Route::get('orders', 'POSController@order_list')->name('orders');
             Route::get('order-details/{id}', 'POSController@order_details')->name('order-details');
@@ -645,6 +647,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('change-cart','POSController@change_cart')->name('change-cart');
             Route::get('new-cart-id','POSController@new_cart_id')->name('new-cart-id');
             Route::post('remove-discount','POSController@remove_discount')->name('remove-discount');
+            Route::post('get-recamt','POSController@get_recamt')->name('get-recamt');
             Route::get('clear-cart-ids','POSController@clear_cart_ids')->name('clear-cart-ids');
             Route::get('get-cart-ids','POSController@get_cart_ids')->name('get-cart-ids');
 

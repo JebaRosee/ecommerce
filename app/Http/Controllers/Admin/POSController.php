@@ -11,6 +11,7 @@ use App\Model\Product;
 use App\Model\Color;
 use Brian2694\Toastr\Facades\Toastr;
 use App\Model\Order;
+use App\Model\Receipt;
 use App\Model\Coupon;
 use App\User;
 use App\Model\OrderDetail;
@@ -704,6 +705,27 @@ class POSController extends Controller
 
         return response()->json($data);
     }
+
+    public function get_customers_without_walkin(Request $request)
+    {
+        $key = explode(' ', $request['q']);
+        $data = DB::table('users')
+            ->where(function ($q) use ($key) {
+                foreach ($key as $value) {
+                    $q->orWhere('f_name', 'like', "%{$value}%")
+                        ->orWhere('l_name', 'like', "%{$value}%")
+                        ->orWhere('phone', 'like', "%{$value}%");
+                }
+            })
+            ->whereNotNull(['f_name', 'l_name', 'phone'])
+            ->where("id","!=","0")
+            ->limit(8)
+            ->get([DB::raw('id,IF(id <> "0", CONCAT(f_name, " ", l_name, " (", phone ,")"),CONCAT(f_name, " ", l_name)) as text')]);
+
+        //$data[] = (object)['id' => false, 'text' => 'walk_in_customer'];
+
+        return response()->json($data);
+    }
     public function place_order(Request $request)
     {
         $cart_id = session('current_user');
@@ -933,6 +955,21 @@ class POSController extends Controller
             'current_user'=>session('current_user'),
             'current_customer'=>$current_customer,
             'view' => view('admin-views.pos._cart',compact('cart_id'))->render()]);
+    }
+
+    public function get_recamt(Request $request)
+    {
+        $customerId = $request->user_id;
+        $customerOrderAmount = Order::where('customer_id', $customerId)->sum('credit_amt');
+        // $customerReceiptAmount = Receipt::where('customer_id', $customerId)->sum('receipt_amount');
+        $customerReceiptAmount = DB::table('receipts')->where('customer_id', $customerId)
+        ->selectRaw('SUM(COALESCE(CAST(cash_amt AS DECIMAL(10, 2)), 0) + COALESCE(CAST(card_amt AS DECIMAL(10, 2)), 0) + COALESCE(CAST(upi_amt AS DECIMAL(10, 2)), 0)) as total_amount')
+        ->value('total_amount');
+
+        // Calculate remaining amount
+        $remainingAmount = $customerOrderAmount - $customerReceiptAmount;
+
+        return response()->json(['remainingAmount' => $remainingAmount,'order' => $customerOrderAmount, 'rec' => $customerReceiptAmount]);
     }
     public function new_cart_id(Request $request)
     {

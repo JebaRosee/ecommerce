@@ -24,7 +24,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body" style="text-align: {{Session::get('direction') === "rtl" ? 'right' : 'left'}};">
-                        <form action="{{route('admin.category.store')}}" method="POST" enctype="multipart/form-data">
+                        <form action="{{route('admin.receipt.store')}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @php($language=\App\Model\BusinessSetting::where('type','pnc_language')->first())
                             @php($language = $language->value ?? null)
@@ -53,7 +53,7 @@
 
                                 <div class="col-md-3 col-lg-2 form-group">
                                     <label class="title-color">{{\App\CPU\translate('Receipt_amount')}}<span class="text-danger">*</span></label>
-                                    <input type="text" name="name[]" class="form-control"placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('1000')}}" {{$lang == $default_lang? 'required':''}}>
+                                    <input type="text" name="receipt_amount" id="receipt_amount" class="form-control"placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('1000')}}" {{$lang == $default_lang? 'required':''}} required readonly>
 
                                 </div>
                                 
@@ -77,17 +77,17 @@
                     <input type="radio" value="upi" id="upi" name="type" hidden>
                     <label for="upi" class="btn btn--bordered btn--bordered-black px-4 mb-0">{{\App\CPU\translate('Upi')}}</label>
                 </li>
-                <li>
+                {{-- <li>
                     <input type="radio" value="credit" id="credit" name="type" hidden>
                     <label for="credit" class="btn btn--bordered btn--bordered-black px-4 mb-0">{{\App\CPU\translate('Credit')}}</label>
-                </li>
+                </li> --}}
             </ul>
         </div>
 
         <div class="col-lg-4">
             <div class="from-group" id="cashInput" style="">
                 <label class="title-color">{{\App\CPU\translate('CASH')}}</label>
-                <input type="text" id="cash_amt" class="form-control" name="cash_amt" placeholder="Ex: 500">
+                <input type="text" id="cash_amt" class="form-control" name="cash_amt" placeholder="Ex: 500" oninput="validateNumericInput(this)">
             </div>
 
             <div class="from-group" id="cardInput" style="display: none;">
@@ -96,11 +96,11 @@
                 <label class="title-color">{{\App\CPU\translate('APPR Code')}}</label>
                 <input type="text" id="card_code" class="form-control" name="card_code" placeholder="Ex: 000000">
                 <label class="title-color">{{\App\CPU\translate('Amount')}}</label>
-                <input type="text" id="card_amt" class="form-control" name="card_amt" placeholder="Ex: 500">
+                <input type="text" id="card_amt" class="form-control" name="card_amt" placeholder="Ex: 500" oninput="validateNumericInput(this)">
             </div>
             <div class="from-group" id="upiInput" style="display: none;">
                 <label class="title-color">{{\App\CPU\translate('Amount')}}</label>
-                <input type="text" id="upi_amt" class="form-control" name="upi_amt" placeholder="Ex: 500">
+                <input type="text" id="upi_amt" class="form-control" name="upi_amt" placeholder="Ex: 500" oninput="validateNumericInput(this)">
                 <label class="title-color">{{\App\CPU\translate('Upi ID')}}</label>
                 <input type="text" id="upi_id" class="form-control" name="upi_id" placeholder="Ex: www@axl">
             </div>
@@ -133,33 +133,47 @@
                             class="table table-hover table-borderless table-thead-bordered table-nowrap table-align-middle card-table w-100">
                             <thead class="thead-light thead-50 text-capitalize">
                                 <tr>
-                                    <th>{{ \App\CPU\translate('SI')}}</th>
-                                    <th class="text-center">{{ \App\CPU\translate('Bill')}} {{ \App\CPU\translate('Date')}}</th>
-                                    <th>{{ \App\CPU\translate('Bill No')}}</th>
-                                    <th>{{\App\CPU\translate('Amt Paid')}}</th>
-                                    <th class="text-center">{{ \App\CPU\translate('Balance')}}</th>
+                                    <th>{{ \App\CPU\translate('ID')}}</th>
+                                    <th class="text-center">{{ \App\CPU\translate('Receipt Date')}}</th>
+                                    <th class="text-center">{{ \App\CPU\translate('Customer')}}</th>
+                                    <th class="text-right">{{\App\CPU\translate('Amt Paid')}}</th>
+                                    <th class="text-right">{{\App\CPU\translate('Payment type')}}</th>
+                                    <th class="text-right">{{\App\CPU\translate('Action')}}</th>
+                                    {{-- <th class="text-center">{{ \App\CPU\translate('Balance')}}</th> --}}
                                 </tr>
                             </thead>
                             <tbody>
                             @foreach($categories as $key=>$category)
                                 <tr>
                                     <td >{{$category['id']}}</td>
-                                    <td class="text-center">
+                                    {{-- <td class="text-center">
                                         <img class="rounded" width="64"
                                                 onerror="this.src='{{asset('public/assets/front-end/img/image-place-holder.png')}}'"
                                                 src="{{asset('storage/app/public/category')}}/{{$category['icon']}}">
+                                    </td> --}}
+                                    <td class="text-center">{{ $category['created_at']->format('d-m-Y') }}</td>
+                                    <td class="text-center">{{$category->customer['f_name'].' '.$category->customer['l_name']}}</td>
+                                    <td class="text-right">{{\App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($category['cash_amt'] + $category['card_amt'] + $category['upi_amt']))}}</td>
+
+                                    <td class="text-right">
+                                        @php ($displayAmounts = array_filter([
+                                                $category['cash_amt'] > 0 ? 'Cash: ' . \App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($category['cash_amt'])) : null,
+                                                $category['card_amt'] > 0 ? 'Card: ' . \App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($category['card_amt'])) : null,
+                                                $category['upi_amt'] > 0 ? 'Upi: ' . \App\CPU\BackEndHelper::set_symbol(\App\CPU\BackEndHelper::usd_to_currency($category['upi_amt'])) : null,
+                                            ]))
+                                    
+                                            {{ implode(', ', $displayAmounts) }} 
+                                        
                                     </td>
-                                    <td>{{$category['defaultname']}}</td>
-                                    <td>
-                                        {{$category['priority']}}
-                                    </td>
-                                    <td class="text-center">
+                                    
+                                    
+                                    {{-- <td class="text-center">
                                         <label class="switcher mx-auto">
                                             <input type="checkbox" class="switcher_input category-status"
                                                     id="{{$category['id']}}" {{$category->home_status == 1?'checked':''}}>
                                             <span class="switcher_control"></span>
                                         </label>
-                                    </td>
+                                    </td> --}}
                                     <!-- <td>
                                         <div class="d-flex justify-content-center gap-10">
                                             <a class="btn btn-outline-info btn-sm square-btn"
@@ -174,6 +188,20 @@
                                             </a>
                                         </div>
                                     </td> -->
+                                    {{-- <td>
+                                        <div class="d-flex justify-content-center gap-10">
+                                        <a id="printBtn" class="btn btn-outline-info btn-sm square-btn" title="{{ \App\CPU\translate('print')}}" data-receipt-id="{{ $category->id }}">
+                                            <i class="tio-print"></i>
+                                        </a>
+                                        </div>
+                                    </td> --}}
+                                    <td>
+                                        <div class="d-flex justify-content-center gap-10">
+                                            <a class="btn btn-outline-info btn-sm square-btn printBtn" title="{{ \App\CPU\translate('print')}}" data-receipt-id="{{ $category->id }}">
+                                                <i class="tio-print"></i>
+                                            </a>
+                                        </div>
+                                    </td>
                                 </tr>
                             @endforeach
                             </tbody>
@@ -197,6 +225,67 @@
             </div>
         </div>
     </div>
+    @php($order=\App\Model\Receipt::find(session('last_receipt')))
+    @if($order)
+    @php(session(['last_receipt'=> false]))
+    <div class="modal fade py-5" id="print-invoice" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{\App\CPU\translate('Print Invoice')}}</h5>
+                    <button id="invoice_close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body row">
+                    <div class="col-md-12">
+                        <center>
+                            <input id="print_invoice" type="button" class="btn btn--primary non-printable" onclick="printDiv('printableArea')"
+                                value="{{\App\CPU\translate('proceed')}}, {{\App\CPU\translate('if_thermal_printer_is_ready')}}"/>
+                            <a href="{{url()->previous()}}" class="btn btn-danger non-printable">{{\App\CPU\translate('Back')}}</a>
+                        </center>
+                        <hr class="non-printable">
+                    </div>
+                    <div class="row m-auto" id="printableArea">
+                        @include('admin-views.receipt.invoice')
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+{{-- 
+    @php($selectedReceiptId = \Illuminate\Support\Facades\Session::get('selectedReceiptId'))
+    @php($order = \App\Model\Receipt::find($selectedReceiptId))
+    @if($order)
+    <div class="modal fade py-5" id="print-invoices" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{\App\CPU\translate('Print Invoice')}}</h5>
+                    <button id="invoice_close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body row">
+                    <div class="col-md-12">
+                        <center>
+                            <input id="print_invoice" type="button" class="btn btn--primary non-printable" onclick="printDivs('printableArea', {{ $order->id }})"
+                                value="{{\App\CPU\translate('proceed')}}, {{\App\CPU\translate('if_thermal_printer_is_ready')}}"/>
+                            <a href="{{url()->previous()}}" class="btn btn-danger non-printable">{{\App\CPU\translate('Back')}}</a>
+                        </center>
+                        <hr class="non-printable">
+                    </div>
+                    <div class="row m-auto" id="printableArea">
+                         @include('admin-views.receipt.invoice') 
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif --}}
 @endsection
 
 @push('script')
@@ -233,7 +322,7 @@ $(document).on('ready', function () {
 
     $('.js-data-example-ajax').select2({
         ajax: {
-            url: '{{route('admin.pos.customers')}}',
+            url: '{{route('admin.pos.customers-withoutwalkin')}}',
             data: function (params) {
                 return {
                     q: params.term, // search term
@@ -345,8 +434,9 @@ $(document).on('ready', function () {
     "use strict";
     function customer_change(val) {
         //let  cart_id = $('#cart_id').val();
+        // alert(val);
         $.post({
-                url: '{{route('admin.pos.remove-discount')}}',
+                url: '{{route('admin.pos.get-recamt')}}',
                 data: {
                     _token: '{{csrf_token()}}',
                     //cart_id:cart_id,
@@ -358,13 +448,14 @@ $(document).on('ready', function () {
                 success: function (data) {
                     console.log(data);
 
-                    var output = '';
-                    for(var i=0; i<data.cart_nam.length; i++) {
-                        output += `<option value="${data.cart_nam[i]}" ${data.current_user==data.cart_nam[i]?'selected':''}>${data.cart_nam[i]}</option>`;
-                    }
-                    $('#cart_id').html(output);
-                    $('#current_customer').text(data.current_customer);
-                    $('#cart').empty().html(data.view);
+                    // var output = '';
+                    // for(var i=0; i<data.cart_nam.length; i++) {
+                    //     output += `<option value="${data.cart_nam[i]}" ${data.current_user==data.cart_nam[i]?'selected':''}>${data.cart_nam[i]}</option>`;
+                    // }
+                    // $('#cart_id').html(output);
+                    // $('#current_customer').text(data.current_customer);
+                    // $('#cart').empty().html(data.view);
+                    $('#receipt_amount').val(data.remainingAmount);
                 },
                 complete: function () {
                     $('#loading').addClass('d-none');
@@ -427,6 +518,60 @@ $(document).on('ready', function () {
     });
 });
 // ---------------paid by----------------
-
+function validateNumericInput(input) {
+  // Remove non-numeric characters from the input value
+  input.value = input.value.replace(/[^0-9]/g, '');
+}
+$(document).on('ready', function () {
+        @if($order)
+        $('#print-invoice').modal('show');
+        @endif
+    });
+    function printDiv(divName) {
+        var printContents = document.getElementById(divName).innerHTML;
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        // location.reload();
+    }
     </script>
+    {{-- <script>
+        // document.getElementById('printBtn').addEventListener('click', function() {
+        //     // var receiptId = this.getAttribute('data-receipt-id');
+        //     // printDiv('printableArea', receiptId);
+        //     $('#print-invoices').modal('show');
+        // });
+
+        document.querySelectorAll('.printBtn').forEach(function(button) {
+    button.addEventListener('click', function() {
+        var receiptId = this.getAttribute('data-receipt-id');
+        localStorage.setItem('selectedReceiptId', receiptId);
+        printDivs('printableArea', receiptId);
+    });
+});
+function printDivs(divId, receiptId) {
+    // Log the receiptId to ensure it's received correctly
+    console.log('Receipt ID:', receiptId);
+
+    var printContents = document.getElementById(divId).innerHTML;
+    var originalContents = document.body.innerHTML;
+
+    document.body.innerHTML = printContents;
+    window.print();
+    document.body.innerHTML = originalContents;
+}
+    
+        // function printDiv(divId, receiptId) {
+        //     // Pass the receiptId to your print function
+        //     console.log('Receipt ID:', receiptId);
+    
+        //     var printContents = document.getElementById(divId).innerHTML;
+        //     var originalContents = document.body.innerHTML;
+    
+        //     document.body.innerHTML = printContents;
+        //     window.print();
+        //     document.body.innerHTML = originalContents;
+        // }
+    </script> --}}
 @endpush

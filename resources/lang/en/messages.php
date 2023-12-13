@@ -3742,4 +3742,7 @@
   'Card Num' => 'Card Num',
   'Card Code' => 'Card Code',
   'Card Amt' => 'Card Amt',
+  'Receipt Date' => 'Receipt Date',
+  'Payment type' => 'Payment type',
+  'Receipt ID' => 'Receipt ID',
 );
