@@ -53,8 +53,19 @@
                                 </div>
                                 <div class="col-md-3 col-lg-3 form-group">
                                     <label class="title-color">{{\App\CPU\translate('account_name')}}<span class="text-danger">*</span></label>
-                                    <input type="text" name="acc_name" class="form-control"placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('Meals Expenses')}}" {{$lang == $default_lang? 'required':''}} required>
+                                    <select id='acc_name' name="acc_name" class=" form-control form-ellipsis" required>
+                                        <option value="">{{\App\CPU\translate('Select')}}</option>
+                                        <option value="Meals Expenses
+                                        ">{{\App\CPU\translate('Meals Expenses
+                                        ')}}</option>
+                                        <option value="Freight Inward">{{\App\CPU\translate('Freight Inward')}}</option>
+                                        <option value="Freight Outward">{{\App\CPU\translate('Freight Outward')}}</option>
+                                        <option value="Maintenance Expenses">{{\App\CPU\translate('Maintenance Expenses')}}</option>
+                                        <option value="Travelling Expenses">{{\App\CPU\translate('Travelling Expenses')}}</option>
+                                    </select>
                                 </div>
+
+
                                 <div class="col-md-1 col-lg-4 form-group">
                                     <label class="title-color">{{\App\CPU\translate('Remarks')}}<span class="text-danger">*</span></label>
                                     <input type="text" name="remarks" class="form-control"placeholder="{{\App\CPU\translate('Type')}} {{\App\CPU\translate('here')}}" {{$lang == $default_lang? 'required':''}} required>

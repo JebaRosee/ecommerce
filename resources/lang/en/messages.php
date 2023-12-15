@@ -3747,4 +3747,9 @@
   'Receipt ID' => 'Receipt ID',
   'Opening Balance' => 'Opening Balance',
   'remarks' => 'Remarks',
+  'Meals Expenses ' => 'Meals Expenses ',
+  'Freight Inward' => 'Freight Inward',
+  'Freight Outward' => 'Freight Outward',
+  'Maintenance Expenses' => 'Maintenance Expenses',
+  'Travelling Expenses' => 'Travelling Expenses',
 );
