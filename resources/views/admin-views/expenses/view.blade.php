@@ -12,7 +12,7 @@
         <div class="mb-3">
             <h2 class="h1 mb-0 d-flex gap-10">
                 <img src="{{asset('/public/assets/back-end/img/brand-setup.png')}}" alt="">
-                {{\App\CPU\translate('Outgoing')}} {{\App\CPU\translate('Payment')}}
+                {{\App\CPU\translate('Expenses')}}
                 <input id="date" type="date" name="date" value="{{ old('date', now()->toDateString()) }}" style="position: absolute; right: 0; padding:2px; margin-right:40px;  border: 1px solid #f9f9fb; border-radius:2px;background-color:#f9f9fb; font-weight:bold;" 
                 placeholder="{{ \App\CPU\translate('date') }}" required>
             </h2>
@@ -61,7 +61,7 @@
                                 </div>
                                 <div class="col-md-1 col-lg-2 form-group">
                                     <label class="title-color">{{\App\CPU\translate('amount')}}<span class="text-danger">*</span></label>
-                                    <input type="text" name="amount" class="form-control"placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('1000')}}" {{$lang == $default_lang? 'required':''}} required>
+                                    <input type="text" name="amount" class="form-control"placeholder="{{\App\CPU\translate('Ex :')}} {{\App\CPU\translate('1000')}}" {{$lang == $default_lang? 'required':''}} required oninput="validateNumericInput(this)">
                                 </div>
                             </div>
 
@@ -342,5 +342,9 @@ $(document).on('ready', function () {
         $("#customFileEg1").change(function () {
             readURL(this);
         });
+        function validateNumericInput(input) {
+  // Remove non-numeric characters from the input value
+  input.value = input.value.replace(/[^0-9]/g, '');
+}
     </script>
 @endpush

@@ -187,26 +187,26 @@
 
 <div class="from-group" id="cashInput" style="">
     <label class="title-color">{{\App\CPU\translate('CASH')}}</label>
-    <input type="text" id="cash_amt" class="form-control" name="cash_amt" placeholder="Ex: 500">
+    <input type="text" id="cash_amt" class="form-control" name="cash_amt" placeholder="Ex: 500" oninput="validateNumericInput(this)">
 </div>
 
 <div class="from-group" id="cardInput" style="display: none;">
     <label class="title-color">{{\App\CPU\translate('Card Number')}}</label>
-    <input type="text" id="card_num" class="form-control" name="card_num" placeholder="Ex: 0000">
+    <input type="text" id="card_num" class="form-control" name="card_num" placeholder="Ex: 0000" maxlength="4">
     <label class="title-color">{{\App\CPU\translate('APPR Code')}}</label>
-    <input type="text" id="card_code" class="form-control" name="card_code" placeholder="Ex: 000000">
+    <input type="text" id="card_code" class="form-control" name="card_code" placeholder="Ex: 000000" maxlength="6">
     <label class="title-color">{{\App\CPU\translate('Amount')}}</label>
-    <input type="text" id="card_amt" class="form-control" name="card_amt" placeholder="Ex: 500">
+    <input type="text" id="card_amt" class="form-control" name="card_amt" placeholder="Ex: 500" oninput="validateNumericInput(this)">
 </div>
 <div class="from-group" id="upiInput" style="display: none;">
     <label class="title-color">{{\App\CPU\translate('Amount')}}</label>
-    <input type="text" id="upi_amt" class="form-control" name="upi_amt" placeholder="Ex: 500">
+    <input type="text" id="upi_amt" class="form-control" name="upi_amt" placeholder="Ex: 500" oninput="validateNumericInput(this)">
     <label class="title-color">{{\App\CPU\translate('Upi ID')}}</label>
     <input type="text" id="upi_id" class="form-control" name="upi_id" placeholder="Ex: www@axl">
 </div>
 <div class="from-group" id="creditInput" style="display: none;">
     <label class="title-color">{{\App\CPU\translate('Amount')}}</label>
-    <input type="text" id="credit_amt" class="form-control" name="credit_amt" placeholder="Ex: 500">
+    <input type="text" id="credit_amt" class="form-control" name="credit_amt" placeholder="Ex: 500" oninput="validateNumericInput(this)">
     <label class="title-color">{{\App\CPU\translate('Remark')}}</label>
     <input type="text" id="credit_remark" class="form-control" name="credit_remark" placeholder="Ex: Type here">
 </div>
@@ -368,6 +368,11 @@
             $('#creditInput').hide();
         }
     });
+    
 });
+function validateNumericInput(input) {
+  // Remove non-numeric characters from the input value
+  input.value = input.value.replace(/[^0-9]/g, '');
+}
 </script>
 

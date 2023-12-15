@@ -60,7 +60,14 @@
                                     <input type="text" name="totalAmount" id="totalAmount" class="form-control"placeholder="{{\App\CPU\translate('')}} {{\App\CPU\translate('')}}" {{$lang == $default_lang? 'required':''}} readonly>
 
                                 </div>
-                                
+                                <div class="col-md-4 col-lg-3 form-group">
+                                    <label class="title-color">{{\App\CPU\translate('Remarks')}}</label>
+                                    <input type="text" name="remarks" id="remarks" class="form-control"placeholder="{{\App\CPU\translate('')}} {{\App\CPU\translate('Remarks')}}" {{$lang == $default_lang? 'required':''}} >
+                                </div>
+                                <div class="col-md-3 col-lg-2 form-group">
+                                    <label class="title-color">{{\App\CPU\translate('Opening Balance')}}</label>
+                                    <input type="text" name="op_bal" id="op_bal" class="form-control"placeholder="{{\App\CPU\translate('')}} {{\App\CPU\translate('Opening Balance')}}" {{$lang == $default_lang? 'required':''}} readonly>
+                                </div>
                             </div>
 
     <!-- ----------------------Paid by--------------------- -->
@@ -213,6 +220,7 @@
                                     <!-- <th class="text-center">{{ \App\CPU\translate('Category')}} {{ \App\CPU\translate('Image')}}</th> -->
                                     <th class="text-center">{{ \App\CPU\translate('date')}}</th>
                                     <th class="text-center">{{\App\CPU\translate('bank')}}</th>
+                                    <th class="text-center">{{\App\CPU\translate('remarks')}}</th>
                                     <th class="text-right">{{ \App\CPU\translate('total_amount')}}</th>
                                     <!-- <th class="text-center">{{ \App\CPU\translate('action')}}</th> -->
                                 </tr>
@@ -229,6 +237,7 @@
                                     <td class="text-center">{{ $category['created_at']->format('d-m-Y') }}</td>
 
                                     <td class="text-center">{{$category['bank_name']}}</td>
+                                    <td class="text-center">{{$category['remarks']}}</td>
                                     <td class="text-right">
                                         {{$category['totalAmount']}}
                                     </td>
@@ -303,6 +312,31 @@ $(document).on('ready', function () {
                     $('#cart_id').html(output);
                     $('#current_customer').text(data.current_customer);
                     $('#cart').empty().html(data.view);
+
+            },
+            complete: function () {
+                $('#loading').addClass('d-none');
+            },
+        });
+        $.ajax({
+            url: '{{route('admin.pos.get-opbal')}}',
+            type: 'GET',
+
+            dataType: 'json', // added data type
+            beforeSend: function () {
+                $('#loading').removeClass('d-none');
+                //console.log("loding");
+            },
+            success: function (data) {
+                // console.log(data);
+                // var output = '';
+                //     for(var i=0; i<data.cart_nam.length; i++) {
+                //         output += `<option value="${data.cart_nam[i]}" ${data.current_user==data.cart_nam[i]?'selected':''}>${data.cart_nam[i]}</option>`;
+                //     }
+                //     $('#cart_id').html(output);
+                //     $('#current_customer').text(data.current_customer);
+                //     $('#cart').empty().html(data.view);
+                $('#op_bal').val((data.opening_balance).toFixed(2));
 
             },
             complete: function () {

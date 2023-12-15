@@ -3745,4 +3745,6 @@
   'Receipt Date' => 'Receipt Date',
   'Payment type' => 'Payment type',
   'Receipt ID' => 'Receipt ID',
+  'Opening Balance' => 'Opening Balance',
+  'remarks' => 'Remarks',
 );

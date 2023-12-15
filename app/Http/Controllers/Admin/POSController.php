@@ -12,6 +12,8 @@ use App\Model\Color;
 use Brian2694\Toastr\Facades\Toastr;
 use App\Model\Order;
 use App\Model\Receipt;
+use App\Model\Expenses;
+use App\Model\Cashdeposit;
 use App\Model\Coupon;
 use App\User;
 use App\Model\OrderDetail;
@@ -897,6 +899,27 @@ class POSController extends Controller
             'current_user'=>session('current_user'),'cart_nam'=>session('cart_name')??'',
             'current_customer'=>$current_customer,
             'view'=> view('admin-views.pos._cart',compact('cart_id'))->render()]);
+    }
+
+    public function get_opbal(Request $request)
+    {
+        // Calculate the sum of cash_amt from the Order table
+        $orderSum = Order::sum('cash_amt');
+
+        // Calculate the sum of cash_amt from the Receipt table
+        $receiptSum = Receipt::sum('cash_amt');
+
+        // Calculate the sum of cash_amt from the Expense table
+        $expenseSum = Expenses::sum('amount');
+
+        // Calculate the sum of cash_amt from the CashDeposit table
+        $cashDepositSum = Cashdeposit::sum('totalAmount');
+
+        // Calculate the final opening balance
+        $openingBalance = ($orderSum + $receiptSum) - ($expenseSum + $cashDepositSum);
+
+        // Return the result as JSON
+        return response()->json(['opening_balance' => $openingBalance,'receiptSum' => $receiptSum,'expenseSum' => $expenseSum,'cashDepositSum' => $cashDepositSum,'orderSum' => $orderSum]);
     }
     public function clear_cart_ids()
     {

@@ -22,3 +22,5 @@ alter table receipts add  `card_num` int(4) DEFAULT NULL;
  alter table receipts add `credit_remark` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL;
  alter table receipts add `card_deposit` text COLLATE utf8mb4_unicode_ci DEFAULT NULL;
   alter table receipts add `receipt_amount` decimal(10,0) DEFAULT NULL;
+
+  alter table cashdeposit add `remarks` text COLLATE utf8mb4_unicode_ci DEFAULT NULL;

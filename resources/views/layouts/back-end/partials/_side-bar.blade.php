@@ -96,7 +96,7 @@
                                 title="{{\App\CPU\translate('Expenses')}}" href="{{route('admin.expenses.view')}}">
                                 <i class="tio-shopping nav-icon"></i>
                                 <span
-                                    class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">{{\App\CPU\translate('Outgoing_Payments')}}</span>
+                                    class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">{{\App\CPU\translate('Expenses')}}</span>
                             </a>
                         </li>
                         <!-- End Expenses -->

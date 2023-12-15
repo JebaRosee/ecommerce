@@ -92,9 +92,9 @@
 
             <div class="from-group" id="cardInput" style="display: none;">
                 <label class="title-color">{{\App\CPU\translate('Card Number')}}</label>
-                <input type="text" id="card_num" class="form-control" name="card_num" placeholder="Ex: 0000">
+                <input type="text" id="card_num" class="form-control" name="card_num" placeholder="Ex: 0000" maxlength="4">
                 <label class="title-color">{{\App\CPU\translate('APPR Code')}}</label>
-                <input type="text" id="card_code" class="form-control" name="card_code" placeholder="Ex: 000000">
+                <input type="text" id="card_code" class="form-control" name="card_code" placeholder="Ex: 000000" maxlength="6">
                 <label class="title-color">{{\App\CPU\translate('Amount')}}</label>
                 <input type="text" id="card_amt" class="form-control" name="card_amt" placeholder="Ex: 500" oninput="validateNumericInput(this)">
             </div>
@@ -446,7 +446,7 @@ $(document).on('ready', function () {
                     $('#loading').removeClass('d-none');
                 },
                 success: function (data) {
-                    console.log(data);
+                    // console.log(data);
 
                     // var output = '';
                     // for(var i=0; i<data.cart_nam.length; i++) {

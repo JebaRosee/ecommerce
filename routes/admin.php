@@ -650,6 +650,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::post('get-recamt','POSController@get_recamt')->name('get-recamt');
             Route::get('clear-cart-ids','POSController@clear_cart_ids')->name('clear-cart-ids');
             Route::get('get-cart-ids','POSController@get_cart_ids')->name('get-cart-ids');
+            Route::get('get-opbal','POSController@get_opbal')->name('get-opbal');
 
             Route::post('customer-store', 'POSController@customer_store')->name('customer-store');
         });

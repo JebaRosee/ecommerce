@@ -96,6 +96,7 @@ class CashdepositController extends Controller
         $cashdeposit->amount2000 = $request->amount2000;
         $cashdeposit->result2000 = $request->result2000;
         $cashdeposit->totalAmount = $request->totalAmount;
+        $cashdeposit->remarks = $request->remarks;
         $cashdeposit->save();
         // Cashdeposit::create($request->all());
         Toastr::success('Deposited successfully!');
