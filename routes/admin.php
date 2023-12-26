@@ -328,6 +328,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('all-product-excel', 'ProductReportController@all_product_export_excel')->name('all-product-excel');
 
             Route::get('order', 'OrderReportController@order_list')->name('order');
+            Route::get('cashbook', 'OrderReportController@cashbook')->name('cashbook');
             Route::get('order-report-excel', 'OrderReportController@order_report_export_excel')->name('order-report-excel');
         });
         Route::group(['prefix' => 'stock', 'as' => 'stock.' ,'middleware'=>['module:report']], function () {

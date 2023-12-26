@@ -3752,4 +3752,9 @@
   'Freight Outward' => 'Freight Outward',
   'Maintenance Expenses' => 'Maintenance Expenses',
   'Travelling Expenses' => 'Travelling Expenses',
+  'CashBook' => 'CashBook',
+  'CashBook Report' => 'CashBook Report',
+  'Closing Bal' => 'Closing Bal',
+  'Closing Balance' => 'Closing Balance',
+  'Today' => 'Today',
 );

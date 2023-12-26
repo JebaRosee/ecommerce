@@ -705,6 +705,18 @@
                             </span>
                             </a>
                         </li>
+
+
+                        <li class="navbar-vertical-aside-has-menu {{Request::is('admin/report/cashbook')?'active':''}}">
+                            <a class="js-navbar-vertical-aside-menu-link nav-link"
+                               href="{{route('admin.report.cashbook')}}"
+                               title="{{\App\CPU\translate('CashBook')}} {{\App\CPU\translate('Report')}}">
+                                <i class="tio-chart-bar-1 nav-icon"></i>
+                                <span class="navbar-vertical-aside-mini-mode-hidden-elements text-truncate">
+                             {{\App\CPU\translate('CashBook')}} {{\App\CPU\translate('Report')}}
+                            </span>
+                            </a>
+                        </li>
                         @endif
                         <!--Reports & Analytics section End-->
 

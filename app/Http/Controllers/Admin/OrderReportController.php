@@ -12,6 +12,9 @@ use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Rap2hpoutre\FastExcel\FastExcel;
+use App\Model\Receipt;
+use App\Model\Expenses;
+use App\Model\Cashdeposit;
 
 class OrderReportController extends Controller
 {
@@ -89,6 +92,378 @@ class OrderReportController extends Controller
         ];
 
         return view('admin-views.report.order-index', compact('orders', 'order_count', 'payment_data', 'chart_data', 'due_amount', 'settled_amount', 'sellers', 'seller_id', 'search', 'date_type', 'from', 'to'));
+    }
+
+    public function cashbook(Request $request)
+    {
+        // $seller_id = $request->seller_id ?? 'all';
+        $date_type = $request->date_type ?? 'custom_date';
+        $from = $request->from;
+        $to = $request->to;
+        if(!$from){
+            $from = Carbon::now()->toDateString();
+        }
+        if(!$to){
+            $to = Carbon::now()->toDateString();
+        }
+        
+        // $search = $request->search;
+        // $query_param = ['search' => $request->search, 'date_type' => $date_type, 'from' => $from, 'to' => $to];
+
+        // $date_type = $request->input('date_type', 'today');
+        // $from = $request->input('from');
+        // $to = $request->input('to');
+        // $sellers = Seller::where(['status'=>'approved'])->get();
+
+        // $chart_data = self::order_report_chart_filter($request);
+
+        // $orders = self::all_order_table_data_filter($request);
+        // $orders = $orders->latest('updated_at')->paginate(Helpers::pagination_limit())->appends($query_param);
+
+        // $ongoing_order_query = Order::whereIn('order_status',['out_for_delivery','processing','confirmed', 'pending']);
+        // $ongoing_order = self::order_count($request, $ongoing_order_query);
+
+        // $cancel_order_query = Order::whereIn('order_status',['canceled','failed','returned']);
+        // $canceled_order = self::order_count($request, $cancel_order_query);
+
+        // $delivered_order_query = Order::where('order_status','delivered');
+        // $delivered_order = self::order_count($request, $delivered_order_query);
+
+        // $order_count = array(
+        //     'ongoing_order'=>$ongoing_order,
+        //     'canceled_order'=>$canceled_order,
+        //     'delivered_order'=>$delivered_order,
+        //     'total_order'=>$canceled_order+$ongoing_order+$delivered_order,
+        // );
+
+        // $due_amount_order_query = Order::whereNotIn('order_status', ['delivered', 'canceled', 'returned', 'failed'])
+        //     ->when($seller_id != 'all', function ($query) use ($seller_id) {
+        //         $query->when($seller_id == 'inhouse', function ($q) {
+        //             $q->where(['seller_id' => 1, 'seller_is' => 'admin']);
+        //         })->when($seller_id != 'inhouse', function ($q) use ($seller_id) {
+        //             $q->where(['seller_id' => $seller_id, 'seller_is' => 'seller']);
+        //         });
+        //     });
+        // $due_amount = self::date_wise_common_filter($due_amount_order_query, $date_type, $from, $to)->sum('order_amount');
+
+        // $settled_amount_query = Order::where('order_status','delivered')
+        //     ->when($seller_id != 'all', function ($query) use ($seller_id) {
+        //         $query->when($seller_id == 'inhouse', function ($q) {
+        //             $q->where(['seller_id' => 1, 'seller_is' => 'admin']);
+        //         })->when($seller_id != 'inhouse', function ($q) use ($seller_id) {
+        //             $q->where(['seller_id' => $seller_id, 'seller_is' => 'seller']);
+        //         });
+        //     });
+        // $settled_amount = self::date_wise_common_filter($settled_amount_query, $date_type, $from, $to)->sum('order_amount');
+
+        // $digital_payment_query = Order::where(['order_status' => 'delivered'])->whereNotIn('payment_method', ['cash', 'cash_on_delivery', 'pay_by_wallet', 'offline_payment']);
+        // $digital_payment = self::pie_chart_common_query($request, $digital_payment_query)->sum('order_amount');
+
+        // $cash_payment_query = Order::where(['order_status' => 'delivered'])->whereIn('payment_method', ['cash', 'cash_on_delivery']);
+        // $cash_payment = self::pie_chart_common_query($request, $cash_payment_query)->sum('order_amount');
+
+        // $wallet_payment_query = Order::where(['order_status' => 'delivered'])->where(['payment_method' => 'pay_by_wallet']);
+        // $wallet_payment = self::pie_chart_common_query($request, $wallet_payment_query)->sum('order_amount');
+
+        // $offline_payment_query = Order::where(['payment_method' => 'offline_payment']);
+        // $offline_payment = self::pie_chart_common_query($request, $offline_payment_query)->sum('order_amount');
+
+        // $total_payment = $cash_payment + $wallet_payment + $digital_payment + $offline_payment;
+
+        // $payment_data = [
+        //     'total_payment' => $total_payment,
+        //     'cash_payment' => $cash_payment,
+        //     'wallet_payment' => $wallet_payment,
+        //     'offline_payment' => $offline_payment,
+        //     'digital_payment' => $digital_payment,
+        // ];
+
+        // return view('admin-views.report.cashbook', compact('orders', 'order_count', 'payment_data', 'chart_data', 'due_amount', 'settled_amount', 'sellers', 'seller_id', 'search', 'date_type', 'from', 'to'));
+        // Calculate the sum of cash_amt from the Order table
+        // $orderSum = Order::sum('cash_amt');
+
+        // // Calculate the sum of cash_amt from the Receipt table
+        // $receiptSum = Receipt::sum('cash_amt');
+
+        // // Calculate the sum of cash_amt from the Expense table
+        // $expenseSum = Expenses::sum('amount');
+
+        // // Calculate the sum of cash_amt from the CashDeposit table
+        // $cashDepositSum = Cashdeposit::sum('totalAmount');
+
+        // // Calculate the final opening balance
+        // $openingBalance = ($orderSum + $receiptSum) - ($expenseSum + $cashDepositSum);
+        // // Get transactions from Order, Receipt, Expense, and CashDeposit tables
+        // $orderTransactions = Order::select('id', 'cash_amt as amount', 'created_at as transaction_date')->addSelect(DB::raw('"Order" as type'))->addSelect(DB::raw('"credit" as ctype'))->get();
+        // $receiptTransactions = Receipt::select('id', 'cash_amt as amount', 'created_at as transaction_date')->addSelect(DB::raw('"Receipt" as type'))->addSelect(DB::raw('"credit" as ctype'))->get();
+        // $expenseTransactions = Expenses::select('id', 'amount as amount', 'created_at as transaction_date')->addSelect(DB::raw('"Expenses" as type'))->addSelect(DB::raw('"debit" as ctype'))->get();
+        // $cashDepositTransactions = Cashdeposit::select('id', 'totalAmount as amount', 'created_at as transaction_date')->addSelect(DB::raw('"Cash Deposit" as type'))->addSelect(DB::raw('"debit" as ctype'))->get();
+
+        // // Merge all transactions
+        // $allTransactions = $orderTransactions->merge($receiptTransactions)->merge($expenseTransactions)->merge($cashDepositTransactions);
+            
+        // // Sort transactions by transaction date
+        // $allTransactions = $allTransactions->sortByDesc('transaction_date');
+
+        // // Calculate closing balance for each transaction
+        // $runningBalance = 0;
+        
+        // $reportRows = [];
+        //--------------------------------
+        // Calculate opening balance before the start date
+        $openingBalance = $this->calculateOpeningBalance($from);
+
+        // Get transactions based on the date filter
+        $allTransactions = $this->getFilteredTransactions($date_type, $from, $to);
+
+        // Sort transactions by transaction date
+        $allTransactions = $allTransactions->sortBy('transaction_date');
+
+        // Calculate closing balance for each transaction
+        $runningBalance = $openingBalance;
+        $reportRows = [];
+
+        foreach ($allTransactions as $transaction) {
+            $amount = ($transaction->ctype == 'credit') ? $transaction->amount : -$transaction->amount;
+            $runningBalance += $amount;
+
+            $reportRows[] = [
+                'id' => $transaction->id,
+                'transaction_date' => $transaction->transaction_date,
+                'amount' => $amount,
+                'type' => $transaction->type,
+                'running_balance' => $runningBalance,
+            ];
+        }
+        // @dd($reportRows);
+        // Return the detailed report as JSON
+        return view('admin-views.report.cashbook', [
+            'openingBalance' => $openingBalance,
+            'closingBalance' => end($reportRows)['running_balance'] ?? $openingBalance,
+            'transactions' => $reportRows,
+            'date_type' => $date_type,
+            'from' => $from,
+            'to' => $to,
+        ]);
+    }
+
+    private function calculateOpeningBalance($from)
+    {
+        // Implement the opening balance calculation logic here
+        // For example, sum of cash_amt from previous transactions before the start date
+        // $from = '2023-12-25';
+        
+        $openingBalance = Order::where('created_at', '<', $from)->sum('cash_amt')
+            + Receipt::where('created_at', '<', $from)->sum('cash_amt')
+            - Expenses::where('created_at', '<', $from)->sum('amount')
+            - Cashdeposit::where('created_at', '<', $from)->sum('totalAmount');
+            // @dd($openingBalance);
+        // $orderSum = Order::sum('cash_amt');
+        // $receiptSum = Receipt::sum('cash_amt');
+
+        // $openingBalances = $orderSum + $receiptSum;
+        // // @dd($openingBalances);
+        // $expenseSum = Expenses::sum('amount');
+        // $cashDepositSum = Cashdeposit::sum('totalAmount');
+
+        // $openingBalancess = $expenseSum + $cashDepositSum;
+        // @dd($openingBalancess);
+        return $openingBalance;
+    }
+
+    public function getFilteredTransactions($date_type, $from, $to)
+    {
+        // Fetch transactions from different tables
+        $orderTransactions = Order::select('id', 'cash_amt as amount', 'created_at as transaction_date')
+            ->addSelect(DB::raw('"Order" as type'))
+            ->addSelect(DB::raw('"credit" as ctype'))
+            ->get();
+        
+        $receiptTransactions = Receipt::select('id', 'cash_amt as amount', 'created_at as transaction_date')
+            ->addSelect(DB::raw('"Receipt" as type'))
+            ->addSelect(DB::raw('"credit" as ctype'))
+            ->get();
+
+        $expenseTransactions = Expenses::select('id', 'amount as amount', 'created_at as transaction_date')
+            ->addSelect(DB::raw('"Expenses" as type'))
+            ->addSelect(DB::raw('"debit" as ctype'))
+            ->get();
+            
+        $cashDepositTransactions = Cashdeposit::select('id', 'totalAmount as amount', 'created_at as transaction_date')
+            ->addSelect(DB::raw('"Cash Deposit" as type'))
+            ->addSelect(DB::raw('"debit" as ctype'))
+            ->get();
+
+        // Merge all transactions
+        $allTransactions = $orderTransactions->concat($receiptTransactions)->concat($expenseTransactions)->concat($cashDepositTransactions);
+
+        // @dd($allTransactions);
+        // Apply date filter conditions
+        $filteredTransactions = $this->applyDateFilter($allTransactions, $date_type, $from, $to);
+        
+        return $filteredTransactions;
+    }
+
+    private function applyDateFilter($transactions, $date_type, $from, $to)
+{
+    // Filter transactions based on date criteria
+    switch ($date_type) {
+        case 'today':
+        
+            $filteredTransactions = $transactions->whereDate('transaction_date', Carbon::now()->toDateString());
+            // @dd(filteredTransactions);
+            break;
+           
+
+        case 'this_month':
+            $filteredTransactions = $transactions->whereMonth('transaction_date', now()->month);
+            break;
+
+        case 'this_week':
+            $filteredTransactions = $transactions->whereBetween('transaction_date', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
+            break;
+
+        case 'custom_date':
+            // Include transactions on the end date as well
+            $filteredTransactions = $transactions->whereBetween('transaction_date', [$from, date('Y-m-d', strtotime($to . ' + 1 day'))]);
+            break;
+
+        default:
+            $filteredTransactions = $transactions;
+            break;
+    }
+
+    return $filteredTransactions;
+}
+
+    public function cashbook_original(Request $request)
+    {
+        // $seller_id = $request->seller_id ?? 'all';
+        $date_type = $request->date_type ?? 'this_year';
+        $from = $request->from;
+        $to = $request->to;
+        $search = $request->search;
+        $query_param = ['search' => $request->search, 'date_type' => $date_type, 'from' => $from, 'to' => $to];
+
+        // $date_type = $request->input('date_type', 'today');
+        // $from = $request->input('from');
+        // $to = $request->input('to');
+        // $sellers = Seller::where(['status'=>'approved'])->get();
+
+        // $chart_data = self::order_report_chart_filter($request);
+
+        // $orders = self::all_order_table_data_filter($request);
+        // $orders = $orders->latest('updated_at')->paginate(Helpers::pagination_limit())->appends($query_param);
+
+        // $ongoing_order_query = Order::whereIn('order_status',['out_for_delivery','processing','confirmed', 'pending']);
+        // $ongoing_order = self::order_count($request, $ongoing_order_query);
+
+        // $cancel_order_query = Order::whereIn('order_status',['canceled','failed','returned']);
+        // $canceled_order = self::order_count($request, $cancel_order_query);
+
+        // $delivered_order_query = Order::where('order_status','delivered');
+        // $delivered_order = self::order_count($request, $delivered_order_query);
+
+        // $order_count = array(
+        //     'ongoing_order'=>$ongoing_order,
+        //     'canceled_order'=>$canceled_order,
+        //     'delivered_order'=>$delivered_order,
+        //     'total_order'=>$canceled_order+$ongoing_order+$delivered_order,
+        // );
+
+        // $due_amount_order_query = Order::whereNotIn('order_status', ['delivered', 'canceled', 'returned', 'failed'])
+        //     ->when($seller_id != 'all', function ($query) use ($seller_id) {
+        //         $query->when($seller_id == 'inhouse', function ($q) {
+        //             $q->where(['seller_id' => 1, 'seller_is' => 'admin']);
+        //         })->when($seller_id != 'inhouse', function ($q) use ($seller_id) {
+        //             $q->where(['seller_id' => $seller_id, 'seller_is' => 'seller']);
+        //         });
+        //     });
+        // $due_amount = self::date_wise_common_filter($due_amount_order_query, $date_type, $from, $to)->sum('order_amount');
+
+        // $settled_amount_query = Order::where('order_status','delivered')
+        //     ->when($seller_id != 'all', function ($query) use ($seller_id) {
+        //         $query->when($seller_id == 'inhouse', function ($q) {
+        //             $q->where(['seller_id' => 1, 'seller_is' => 'admin']);
+        //         })->when($seller_id != 'inhouse', function ($q) use ($seller_id) {
+        //             $q->where(['seller_id' => $seller_id, 'seller_is' => 'seller']);
+        //         });
+        //     });
+        // $settled_amount = self::date_wise_common_filter($settled_amount_query, $date_type, $from, $to)->sum('order_amount');
+
+        // $digital_payment_query = Order::where(['order_status' => 'delivered'])->whereNotIn('payment_method', ['cash', 'cash_on_delivery', 'pay_by_wallet', 'offline_payment']);
+        // $digital_payment = self::pie_chart_common_query($request, $digital_payment_query)->sum('order_amount');
+
+        // $cash_payment_query = Order::where(['order_status' => 'delivered'])->whereIn('payment_method', ['cash', 'cash_on_delivery']);
+        // $cash_payment = self::pie_chart_common_query($request, $cash_payment_query)->sum('order_amount');
+
+        // $wallet_payment_query = Order::where(['order_status' => 'delivered'])->where(['payment_method' => 'pay_by_wallet']);
+        // $wallet_payment = self::pie_chart_common_query($request, $wallet_payment_query)->sum('order_amount');
+
+        // $offline_payment_query = Order::where(['payment_method' => 'offline_payment']);
+        // $offline_payment = self::pie_chart_common_query($request, $offline_payment_query)->sum('order_amount');
+
+        // $total_payment = $cash_payment + $wallet_payment + $digital_payment + $offline_payment;
+
+        // $payment_data = [
+        //     'total_payment' => $total_payment,
+        //     'cash_payment' => $cash_payment,
+        //     'wallet_payment' => $wallet_payment,
+        //     'offline_payment' => $offline_payment,
+        //     'digital_payment' => $digital_payment,
+        // ];
+
+        // return view('admin-views.report.cashbook', compact('orders', 'order_count', 'payment_data', 'chart_data', 'due_amount', 'settled_amount', 'sellers', 'seller_id', 'search', 'date_type', 'from', 'to'));
+        // Calculate the sum of cash_amt from the Order table
+        $orderSum = Order::sum('cash_amt');
+
+        // Calculate the sum of cash_amt from the Receipt table
+        $receiptSum = Receipt::sum('cash_amt');
+
+        // Calculate the sum of cash_amt from the Expense table
+        $expenseSum = Expenses::sum('amount');
+
+        // Calculate the sum of cash_amt from the CashDeposit table
+        $cashDepositSum = Cashdeposit::sum('totalAmount');
+
+        // Calculate the final opening balance
+        $openingBalance = ($orderSum + $receiptSum) - ($expenseSum + $cashDepositSum);
+        // Get transactions from Order, Receipt, Expense, and CashDeposit tables
+        $orderTransactions = Order::select('id', 'cash_amt as amount', 'created_at as transaction_date')->addSelect(DB::raw('"Order" as type'))->addSelect(DB::raw('"credit" as ctype'))->get();
+        $receiptTransactions = Receipt::select('id', 'cash_amt as amount', 'created_at as transaction_date')->addSelect(DB::raw('"Receipt" as type'))->addSelect(DB::raw('"credit" as ctype'))->get();
+        $expenseTransactions = Expenses::select('id', 'amount as amount', 'created_at as transaction_date')->addSelect(DB::raw('"Expenses" as type'))->addSelect(DB::raw('"debit" as ctype'))->get();
+        $cashDepositTransactions = Cashdeposit::select('id', 'totalAmount as amount', 'created_at as transaction_date')->addSelect(DB::raw('"Cash Deposit" as type'))->addSelect(DB::raw('"debit" as ctype'))->get();
+
+        // Merge all transactions
+        $allTransactions = $orderTransactions->merge($receiptTransactions)->merge($expenseTransactions)->merge($cashDepositTransactions);
+            
+        // Sort transactions by transaction date
+        $allTransactions = $allTransactions->sortByDesc('transaction_date');
+
+        // Calculate closing balance for each transaction
+        $runningBalance = 0;
+        
+        $reportRows = [];
+
+        foreach ($allTransactions as $transaction) {
+            $amount = ($transaction->ctype == 'credit') ? $transaction->amount : -$transaction->amount;
+            $runningBalance += $amount;
+
+            $reportRows[] = [
+                'id' => $transaction->id,
+                'transaction_date' => $transaction->transaction_date,
+                'type' => $transaction->type,
+                'amount' => $transaction->amount,
+                'running_balance' => $runningBalance,
+            ];
+        }
+        // @dd($reportRows);
+        // Return the detailed report as JSON
+        return view('admin-views.report.cashbook', [
+            'openingBalance' => $openingBalance,
+            'closingBalance' => end($reportRows)['running_balance'] ?? $openingBalance,
+            'transactions' => $reportRows,
+        ]);
     }
 
     public function order_report_chart_filter($request)
