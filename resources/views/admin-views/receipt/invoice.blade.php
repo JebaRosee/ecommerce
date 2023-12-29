@@ -67,8 +67,8 @@
         }
     }
 </style>
-
-<div style="width:363px">
+{{-- style="width:763px" --}}
+<div style="width:763px">
     <div class="text-center pt-4 mb-3">
         <h5 style="font-size: 16px;font-weight: lighter;line-height: 1">
             Receipt Bill

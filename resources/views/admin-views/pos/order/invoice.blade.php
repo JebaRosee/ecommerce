@@ -67,8 +67,8 @@
         }
     }
 </style>
-
-<div style="width:363px">
+{{-- style="width:763px" --}}
+<div style="width:763px">
     <div class="text-center pt-4 mb-3">
         <h2 style="line-height: 1">{{\App\Model\BusinessSetting::where(['type'=>'company_name'])->first()->value}}</h2>
         {{-- <h5 style="font-size: 20px;font-weight: lighter;line-height: 1">
