@@ -45,7 +45,7 @@
                                     
                                     <div class="form-group">
                                     <label class="title-color">{{\App\CPU\translate('Customer_Name')}}<span class="text-danger">*</span></label>
-                                        <select onchange="customer_change(this.value);" id='customer' name="customer_id" data-placeholder="Walk In Customer" class="js-data-example-ajax form-control form-ellipsis">
+                                        <select required onchange="customer_change(this.value);" id='customer' name="customer_id" data-placeholder="Walk In Customer" class="js-data-example-ajax form-control form-ellipsis">
                                             <option value="0">{{\App\CPU\translate('customer_name')}}</option>
                                         </select>
                                     </div>
@@ -87,7 +87,7 @@
         <div class="col-lg-4">
             <div class="from-group" id="cashInput" style="">
                 <label class="title-color">{{\App\CPU\translate('CASH')}}</label>
-                <input type="text" id="cash_amt" class="form-control" name="cash_amt" placeholder="Ex: 500" oninput="validateNumericInput(this)">
+                <input type="text" id="cash_amt" class="form-control" name="cash_amt" placeholder="Ex: 500" oninput="validateNumericInput(this)" required>
             </div>
 
             <div class="from-group" id="cardInput" style="display: none;">

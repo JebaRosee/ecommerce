@@ -57,7 +57,7 @@
 
                                 <div class="col-md-3 col-lg-2 form-group">
                                     <label class="title-color">{{\App\CPU\translate('Total_amount')}}<span class="text-danger">*</span></label>
-                                    <input type="text" name="totalAmount" id="totalAmount" class="form-control"placeholder="{{\App\CPU\translate('')}} {{\App\CPU\translate('')}}" {{$lang == $default_lang? 'required':''}} readonly>
+                                    <input type="text" name="totalAmount" id="totalAmount" class="form-control"placeholder="{{\App\CPU\translate('')}} {{\App\CPU\translate('')}}" {{$lang == $default_lang? 'required':''}} readonly required>
 
                                 </div>
                                 <div class="col-md-4 col-lg-3 form-group">

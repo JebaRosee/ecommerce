@@ -45,6 +45,13 @@ class CarddepositController extends Controller
 
     public function store(Request $request)
     {
+        $request->validate([
+            'bank_name' => 'required',
+            'totalAmount' => 'required'
+        ], [
+            'bank_name.required' => 'Bank name is required!',
+            'totalAmount.required' => 'Amount is required!',
+        ]);
         // $request->validate([
         //     'name' => 'required',
         //     'image' => 'required',
