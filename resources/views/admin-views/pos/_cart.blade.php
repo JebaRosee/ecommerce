@@ -178,7 +178,7 @@
             <input type="radio" value="upi" id="upi" name="type" hidden>
             <label for="upi" class="btn btn--bordered btn--bordered-black px-4 mb-0">{{\App\CPU\translate('Upi')}}</label>
         </li>
-        <li>
+        <li id="credit-lis">
             <input type="radio" value="credit" id="credit" name="type" hidden>
             <label for="credit" class="btn btn--bordered btn--bordered-black px-4 mb-0">{{\App\CPU\translate('Credit')}}</label>
         </li>
@@ -368,6 +368,24 @@
             $('#creditInput').hide();
         }
     });
+
+
+    var customerId = $('#customer').val();;
+        var creditRadioButton = document.getElementById('credit-lis');
+        // var creditRadio = $('#credit-lis');
+        
+        // Check if customer_id is 0
+        if (customerId == '0') {
+            // alert(customerId);
+
+            creditRadioButton.style.display = 'none';
+
+            // $('#credit-lis').addClass('d-none');
+        } else {
+
+        creditRadioButton.style.display = 'list-item';
+          
+        }
     
 });
 function validateNumericInput(input) {

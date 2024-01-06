@@ -230,7 +230,7 @@
     @php(session(['last_receipt'=> false]))
     <div class="modal fade py-5" id="print-invoice" tabindex="-1">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content" style="width: 850px !important;">
                 <div class="modal-header">
                     <h5 class="modal-title">{{\App\CPU\translate('Print Invoice')}}</h5>
                     <button id="invoice_close" type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -241,7 +241,7 @@
                     <div class="col-md-12">
                         <center>
                             <input id="print_invoice" type="button" class="btn btn--primary non-printable" onclick="printDiv('printableArea')"
-                                value="{{\App\CPU\translate('proceed')}}, {{\App\CPU\translate('if_thermal_printer_is_ready')}}"/>
+                                value="{{\App\CPU\translate('proceed')}}, {{\App\CPU\translate('if_printer_is_ready')}}"/>
                             <a href="{{url()->previous()}}" class="btn btn-danger non-printable">{{\App\CPU\translate('Back')}}</a>
                         </center>
                         <hr class="non-printable">

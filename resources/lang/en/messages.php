@@ -3758,4 +3758,6 @@
   'Closing Balance' => 'Closing Balance',
   'Today' => 'Today',
   'All_copy_right_reserved_©_2024_' => 'All copy right reserved © 2024 ',
+  'cart_empty_warning' => 'Cart empty warning',
+  'if_printer_is_ready' => 'If printer is ready',
 );
