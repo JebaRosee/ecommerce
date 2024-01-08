@@ -292,6 +292,7 @@
                                 </td>
                                 <td>
                                     {{ $product->product_type == 'digital' ? ($product->status==1 ? \App\CPU\translate('available') : \App\CPU\translate('not_available')) : $product->current_stock }}
+                                    {{-- {{ $product->variation }} --}}
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">

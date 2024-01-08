@@ -211,6 +211,14 @@
                             <span>{{\App\CPU\translate('Current Stock')}} : </span>
                             <span class="mx-1">{{ $product->current_stock }}</span>
                         </div>
+                        <div class="flex-start">Stock Details:<br>
+                            @foreach(json_decode($product->variation) as $variant)
+                                <tr>
+                                    <td>{{ $variant->type }}</td> =
+                                    <td>{{ $variant->qty }}</td>
+                                </tr><br>
+                            @endforeach
+                        </div>    
                         @endif
 
                         @if(($product->product_type == 'digital') && ($product->digital_product_type == 'ready_product'))
