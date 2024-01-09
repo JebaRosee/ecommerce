@@ -324,6 +324,13 @@ class ProductReportController extends Controller
         $reportData = array();
         foreach ($products as $key=>$product) {
             $rating = count($product->rating)>0?number_format($product->rating[0]->average, 2, '.', ' '):0;
+
+            $variations = '';
+            foreach (json_decode($product->variation) as $variation) {
+                $variations .= $variation->type . ': ' . $variation->qty . ', ';
+            }
+            $variations = rtrim($variations, ', '); // Remove the trailing comma and space
+            
             $reportData[$key] = array(
                 'Product Name' => Str::limit($product->name, 20),
                 'Product Unit Price' => BackEndHelper::set_symbol(BackEndHelper::usd_to_currency($product->unit_price)),
@@ -331,6 +338,7 @@ class ProductReportController extends Controller
                 'Average Product Value' => BackEndHelper::set_symbol(BackEndHelper::usd_to_currency((isset($product->order_details[0]->total_sold_amount) ? $product->order_details[0]->total_sold_amount : 0) / (isset($product->order_details[0]->product_quantity) ? $product->order_details[0]->product_quantity : 1))),
                 'Current Stock Amount' => $product->product_type == 'digital' ? ($product->status==1 ? 'Available':'Nor Available') : $product->current_stock,
                 'Average Ratings' => $rating.' ('.$product->reviews->count().')',
+                'Stock Details' => $variations,
             );
         }
 

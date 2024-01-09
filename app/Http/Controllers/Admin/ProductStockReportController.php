@@ -58,11 +58,17 @@ class ProductStockReportController extends Controller
             }else{
                 $stock_msg = 'Soon Stock Out';
             }
+            $variations = '';
+            foreach (json_decode($product->variation) as $variation) {
+                $variations .= $variation->type . ': ' . $variation->qty . ', ';
+            }
+            $variations = rtrim($variations, ', '); // Remove the trailing comma and space
             $data[] = array(
                 'Product Name' => $product->name,
                 'Date' => date('d M Y', strtotime($product->updated_at)),
                 'Current Stock' => $product->current_stock,
                 'Status' => $stock_msg,
+                'Stock Details' => $variations,
             );
         }
 
