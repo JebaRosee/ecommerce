@@ -124,6 +124,14 @@ class OrderController extends Controller
             );
     }
 
+    public function orderId(Request $request)
+    {
+        $orderId = $request->orderId;
+        session(['print_order_id' => $orderId]);
+        // return back();
+        return response()->json(['success' => true]);
+    }
+
     public function common_query_status_count($query, $status, $request){
         $search = $request['search'];
         $filter = $request['filter'];

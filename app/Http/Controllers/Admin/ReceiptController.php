@@ -36,6 +36,14 @@ class ReceiptController extends Controller
         return view('admin-views.receipt.view', compact('categories','search'));
     }
 
+    public function receiptid(Request $request)
+    {
+        $receiptId = $request->receiptId;
+        session(['selectedReceiptId' => $receiptId]);
+        // return back();
+        return response()->json(['success' => true]);
+    }
+
     public function store(Request $request)
     {
         // $request->validate([

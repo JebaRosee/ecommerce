@@ -117,6 +117,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('update/{id}', 'ReceiptController@edit')->name('update');
             Route::post('update/{id}', 'ReceiptController@update');
             Route::post('status', 'ReceiptController@status')->name('status');
+            Route::post('receiptid', 'ReceiptController@receiptid')->name('receiptid');
         });
         
         Route::group(['prefix' => 'expenses', 'as' => 'expenses.'], function () {
@@ -617,6 +618,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('add-delivery-man/{order_id}/{d_man_id}', 'OrderController@add_delivery_man')->name('add-delivery-man');
 
             Route::get('export-order-data/{status}', 'OrderController@bulk_export_data')->name('order-bulk-export');
+            Route::post('orderId', 'OrderController@orderId')->name('orderId');
         });
 
         //pos management
@@ -654,6 +656,7 @@ Route::group(['namespace' => 'Admin', 'prefix' => 'admin', 'as' => 'admin.'], fu
             Route::get('get-opbal','POSController@get_opbal')->name('get-opbal');
 
             Route::post('customer-store', 'POSController@customer_store')->name('customer-store');
+            
         });
 
         Route::group(['prefix' => 'helpTopic', 'as' => 'helpTopic.','middleware'=>['module:system_settings']], function () {

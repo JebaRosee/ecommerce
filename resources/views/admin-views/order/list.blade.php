@@ -345,6 +345,9 @@
                                                 href="{{route('admin.orders.generate-invoice',[$order['id']])}}">
                                                 <i class="tio-download-to"></i>
                                             </a>
+                                            <a id="printBtn" class="btn btn-outline-info btn-sm square-btn printBtn" title="{{ \App\CPU\translate('print')}}" order-id="{{ $order['id'] }}">
+                                                <i class="tio-print"></i>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -365,7 +368,36 @@
                 </div>
             </div>
             <!-- End Order States -->
+            @php($order=\App\Model\Order::find(session('print_order_id')))
+            @if($order)
+            @php(session(['print_order_id'=> false]))
+            <div class="modal fade py-5" id="print-invoice" tabindex="-1">
+                <div class="modal-dialog" >
+                    <div class="modal-content" style="width: 850px !important;">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{{\App\CPU\translate('Print Invoice')}}</h5>
+                            <button id="invoice_close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body row">
+                            <div class="col-md-12">
+                                <center>
+                                    <input id="print_invoice" type="button" class="btn btn--primary non-printable" onclick="printDiv('printableArea')"
+                                        value="{{\App\CPU\translate('proceed')}}, {{\App\CPU\translate('if_printer_is_ready')}}"/>
+                                    <a href="{{url()->previous()}}" class="btn btn-danger non-printable">{{\App\CPU\translate('Back')}}</a>
+                                </center>
+                                <hr class="non-printable">
+                            </div>
+                            <div class="row m-auto" id="printableArea">
+                                @include('admin-views.pos.order.invoice')
+                            </div>
 
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
             <!-- Nav Scroller -->
             <div class="js-nav-scroller hs-nav-scroller-horizontal d-none">
                 <span class="hs-nav-scroller-arrow-prev d-none">
@@ -437,4 +469,38 @@
 
         })
     </script>
+    <script>
+    $(document).on('ready', function () {
+        @if($order)
+        $('#print-invoice').modal('show');
+        @endif
+    });
+    function printDiv(divName) {
+        var printContents = document.getElementById(divName).innerHTML;
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        // location.reload();
+    }
+
+    $(document).on('click', '.printBtn', function () {
+        var orderId = $(this).attr("order-id");
+        $.ajax({
+            url: "{{route('admin.orders.orderId')}}",
+            method: 'POST',
+            data: {
+                _token: '{{csrf_token()}}',
+                orderId: orderId,
+                
+            },
+            success: function(response) {
+                    location.reload();
+            },
+            error: function(error) {
+                console.error('Error storing orderId in session:', error);
+            }
+        });
+        });
+    </script>    
 @endpush

@@ -197,7 +197,7 @@
                                     </td> --}}
                                     <td>
                                         <div class="d-flex justify-content-center gap-10">
-                                            <a class="btn btn-outline-info btn-sm square-btn printBtn" title="{{ \App\CPU\translate('print')}}" data-receipt-id="{{ $category->id }}">
+                                            <a id="printBtn" class="btn btn-outline-info btn-sm square-btn printBtn" title="{{ \App\CPU\translate('print')}}" data-receipt-id="{{ $category->id }}">
                                                 <i class="tio-print"></i>
                                             </a>
                                         </div>
@@ -255,13 +255,17 @@
         </div>
     </div>
     @endif
-{{-- 
-    @php($selectedReceiptId = \Illuminate\Support\Facades\Session::get('selectedReceiptId'))
-    @php($order = \App\Model\Receipt::find($selectedReceiptId))
-    @if($order)
+    {{-- @php(print_r(session('selectedReceiptId'))) --}}
+    {{-- <input type="text" id="selectedReceiptIdInput" name="selectedReceiptId" value="1"> --}}
+    {{-- @php($selectedReceiptId = \Illuminate\Support\Facades\Session::get('selectedReceiptId'))
+    @php($order = \App\Model\Receipt::find($selectedReceiptId)) --}}
+    {{-- @php($selectedReceiptId = request('selectedReceiptId')) --}}
+    @php($orders=\App\Model\Receipt::find(session('selectedReceiptId')))
+    @if($orders)
+  
     <div class="modal fade py-5" id="print-invoices" tabindex="-1">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content" style="width: 850px !important;">
                 <div class="modal-header">
                     <h5 class="modal-title">{{\App\CPU\translate('Print Invoice')}}</h5>
                     <button id="invoice_close" type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -271,13 +275,16 @@
                 <div class="modal-body row">
                     <div class="col-md-12">
                         <center>
-                            <input id="print_invoice" type="button" class="btn btn--primary non-printable" onclick="printDivs('printableArea', {{ $order->id }})"
+                         
+                            <input id="print_invoice" type="button" class="btn btn--primary non-printable" onclick="printDiv('printableArea')"
                                 value="{{\App\CPU\translate('proceed')}}, {{\App\CPU\translate('if_thermal_printer_is_ready')}}"/>
                             <a href="{{url()->previous()}}" class="btn btn-danger non-printable">{{\App\CPU\translate('Back')}}</a>
                         </center>
                         <hr class="non-printable">
                     </div>
                     <div class="row m-auto" id="printableArea">
+                        @php($order=\App\Model\Receipt::find(session('selectedReceiptId')))
+                        @php(session(['selectedReceiptId'=> false]))
                          @include('admin-views.receipt.invoice') 
                     </div>
 
@@ -285,7 +292,7 @@
             </div>
         </div>
     </div>
-    @endif --}}
+    @endif
 @endsection
 
 @push('script')
@@ -428,6 +435,37 @@ $(document).on('ready', function () {
                 }
             })
         });
+
+
+        $(document).on('click', '.printBtn', function () {
+            var receiptId = $(this).attr("data-receipt-id");
+            //  alert(receiptId)
+            //var receiptId = this.getAttribute('data-receipt-id');
+            //var al = localStorage.setItem('selectedReceiptId', receiptId);
+           // alert(al);
+        //    $('#selectedReceiptIdInput').val(receiptId);
+           $.ajax({
+                url: "{{route('admin.receipt.receiptid')}}",
+                method: 'POST',
+                data: {
+                    _token: '{{csrf_token()}}',
+                    receiptId: receiptId,
+                   
+                },
+                success: function(response) {
+                     location.reload();
+                    // console.log('ReceiptId stored successfully in session.');
+                    //  $('#print-invoices').modal('show');
+                    
+                },
+                error: function(error) {
+            console.error('Error storing receiptId in session:', error);
+        }
+            });
+
+            // $('#print-invoices').modal('show');
+            // $('#print-invoices').modal('show');
+        });
     </script>
 
 <script>
@@ -526,6 +564,10 @@ $(document).on('ready', function () {
         @if($order)
         $('#print-invoice').modal('show');
         @endif
+
+        @if($orders)
+        $('#print-invoices').modal('show');
+        @endif
     });
     function printDiv(divName) {
         var printContents = document.getElementById(divName).innerHTML;
@@ -535,6 +577,7 @@ $(document).on('ready', function () {
         document.body.innerHTML = originalContents;
         // location.reload();
     }
+    
     </script>
     {{-- <script>
         // document.getElementById('printBtn').addEventListener('click', function() {
