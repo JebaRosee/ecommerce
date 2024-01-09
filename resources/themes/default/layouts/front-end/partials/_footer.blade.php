@@ -105,6 +105,11 @@
                                 </div>
                             @endif
                         </div>
+                        <div class="map">
+                            <div class="google-maps">
+                               <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3942.6431024465764!2d78.13125051410385!3d8.819559194664066!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b03eff4cb9dfd39%3A0x6efcb91711f7f171!2s4!5e0!3m2!1sen!2sin!4v1634106930382!5m2!1sen!2sin" width="600" height="230" allowfullscreen></iframe>
+                            </div>
+                         </div>
                     </div>
                     <div class="col-md-9" >
                         <div class="row">
