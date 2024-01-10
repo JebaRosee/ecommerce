@@ -6,6 +6,7 @@ use App\CPU\Helpers;
 use App\Http\Controllers\Controller;
 use App\Model\Category;
 use App\Model\Product;
+use App\Model\ProductStock;
 use App\Model\Seller;
 use Illuminate\Http\Request;
 use Rap2hpoutre\FastExcel\FastExcel;
@@ -64,6 +65,8 @@ class ProductStockReportController extends Controller
             }
             $variations = rtrim($variations, ', '); // Remove the trailing comma and space
             $data[] = array(
+                'Category' => $product->category ? $product->category->name : 'N/A',
+                'Sub Category' => $product->sub_category ? $product->sub_category->name : 'N/A',
                 'Product Name' => $product->name,
                 'Date' => date('d M Y', strtotime($product->updated_at)),
                 'Current Stock' => $product->current_stock,
@@ -71,7 +74,7 @@ class ProductStockReportController extends Controller
                 'Stock Details' => $variations,
             );
         }
-
+        // @dd($data);
         return (new FastExcel($data))->download('out_of_stock_product.xlsx');
     }
 
